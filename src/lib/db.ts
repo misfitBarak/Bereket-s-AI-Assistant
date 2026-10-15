@@ -1,4 +1,9 @@
 import { PrismaClient } from "@prisma/client";
+import dns from "node:dns";
+
+if (typeof dns.setDefaultResultOrder === "function") {
+  dns.setDefaultResultOrder("ipv4first");
+}
 
 declare global {
   // eslint-disable-next-line no-var
