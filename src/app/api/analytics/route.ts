@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getTaskMetrics, getDepartmentWorkload } from "@/lib/services/taskService";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const now = new Date();

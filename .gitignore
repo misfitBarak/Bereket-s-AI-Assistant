@@ -14,11 +14,9 @@
 
 # Environment variables & secrets (CRITICAL)
 .env
-.env*.local
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env*
+.env.*
+!.env.example
 
 # Databases, SQLite storage, and local snapshots (CRITICAL)
 *.db

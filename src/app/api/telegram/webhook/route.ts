@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { handleTelegramUpdate } from "@/lib/telegram/bot";
 
+export const maxDuration = 30;
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
     const secretHeader = req.headers.get("x-telegram-bot-api-secret-token");
