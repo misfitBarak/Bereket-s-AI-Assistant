@@ -1,0 +1,58 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Next.js build output
+/.next/
+/out/
+/dist/
+/build/
+
+# TypeScript
+*.tsbuildinfo
+
+# Environment variables & secrets (CRITICAL)
+.env
+.env*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Databases, SQLite storage, and local snapshots (CRITICAL)
+*.db
+*.db-journal
+*.sqlite
+*.sqlite-journal
+/prisma/*.db
+/prisma/*.db-journal
+/prisma/backups/
+prisma/test_*.db
+
+# Telegram sessions & auth tokens
+*.session
+*.session-journal
+telegram_session*
+*session*.json
+
+# Data exports & database dumps containing private data
+*backup*.json
+*export*.json
+pre_deployment_*.json
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary reports & local artifacts
+*.pdf
+report.html
+.user_uploaded/
+
+# OS metadata
+.DS_Store
+Thumbs.db

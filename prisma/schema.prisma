@@ -1,0 +1,166 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Task {
+  id                String       @id @default(cuid())
+  workspace         String       // 'abbay_tv' | 'client_work' | 'personal_projects'
+  title             String
+  description       String?
+  status            String       @default("todo") // 'backlog' | 'todo' | 'in_progress' | 'in_review' | 'blocked' | 'completed'
+  priority          String       @default("medium") // 'low' | 'medium' | 'high' | 'urgent'
+  deliverableType   String?      // 'Promo', 'Advert', 'Lower Third', 'L-Shape', 'Thumbnail', 'Poster', 'Media Pack', 'Broadcast Graphic', 'Freelance Video', 'Reel', 'YouTube'
+  assignedTo        String?      // e.g. 'Dani', 'Sura', 'Simon', 'Kiru', 'Bereket', 'Abbay'
+  startDate         DateTime?
+  dueDate           DateTime?
+  completedAt       DateTime?
+  estimatedHours    Float?
+  actualHours       Float?
+  recurringSchedule String?      // e.g. 'Every Monday', 'Weekly Promo', 'Daily'
+  dependencies      String?      // JSON array of task IDs
+  tags              String?      // Comma-separated or JSON
+  projectId         String?
+  project           Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  activityLogs      ActivityLog[]
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@index([workspace, status])
+  @@index([assignedTo])
+  @@index([dueDate])
+}
+
+model Project {
+  id              String    @id @default(cuid())
+  workspace       String    // 'abbay_tv' | 'client_work' | 'personal_projects'
+  title           String
+  description     String?
+  status          String    @default("active") // 'planning' | 'active' | 'in_review' | 'completed' | 'on_hold'
+  category        String?   // 'TV Show Package', 'Client Video Campaign', 'Channel Launch', 'Skill Upgrade', etc.
+  targetDate      DateTime?
+  progress        Int       @default(0) // 0 - 100
+  milestones      String?   // JSON array of milestones [{title, completed, dueDate}]
+  nextAction      String?
+  
+  // Client Work specific fields (private financial tracking)
+  clientName      String?
+  clientContact   String?
+  clientNotes     String?
+  quotedAmount    Float?
+  paidAmount      Float?
+  currency        String?   @default("ETB")
+  invoiceStatus   String?   // 'pending' | 'sent' | 'partial' | 'paid' | 'overdue'
+
+  tasks           Task[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([workspace, status])
+}
+
+model TeamMember {
+  id                    String   @id @default(cuid())
+  name                  String   @unique
+  role                  String   // e.g. 'Senior Motion Designer', '3D / Broadcast Artist', 'Junior Motion Designer', 'Graphic Designer', 'Video Editor'
+  skills                String   // e.g. 'After Effects, Blender, Promos', 'DaVinci Resolve, Color Grading', 'Photoshop, Thumbnails, Posters'
+  currentCapacityHours  Float    @default(40.0) // available weekly hours
+  status                String   @default("available") // 'available' | 'busy' | 'overloaded' | 'on_leave'
+  email                 String?
+  notes                 String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model Memory {
+  id          String   @id @default(cuid())
+  category    String   // 'role_responsibilities' | 'team_profiles' | 'client_preferences' | 'decisions' | 'workflows' | 'long_term_goals' | 'general_notes'
+  title       String
+  content     String
+  tags        String?
+  source      String   @default("user_explicit") // 'user_explicit' | 'chat_extracted' | 'system_seed'
+  importance  Int      @default(3) // 1 - 5
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+}
+
+model ChatMessage {
+  id                  String   @id @default(cuid())
+  conversationId      String   @default("default")
+  role                String   // 'user' | 'assistant' | 'system'
+  content             String
+  toolCalls           String?  // JSON serialized tool call requests
+  toolResults         String?  // JSON serialized tool call results
+  pendingConfirmation String?  // JSON for action awaiting user approval
+  createdAt           DateTime @default(now())
+
+  @@index([conversationId, createdAt])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  taskId    String?
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  action    String   // 'created' | 'status_changed' | 'assigned' | 'rescheduled' | 'completed' | 'note_added'
+  details   String
+  createdAt DateTime @default(now())
+}
+
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model ScheduledMessage {
+  id                String    @id @default(cuid())
+  senderAccount     String    @default("bot") // 'bot' | 'personal'
+  actionType        String    // 'direct_message' | 'task_report' | 'deadline_summary' | 'custom_reminder'
+  recipientType     String    // 'user' | 'group' | 'self'
+  recipientName     String    // e.g. 'Dani', 'Graphics Department', 'Self (Abbay)'
+  targetChatId      String?   // Resolved Telegram chat ID (e.g. '375975361', or '-100...')
+  content           String?   // Custom text to send, or instructions
+  reportType        String?   // 'pending_tasks' | 'today_deadlines' | 'department_workload'
+  scheduledFor      DateTime  // Next scheduled execution time in UTC
+  timezone          String    @default("Africa/Addis_Ababa")
+  recurrenceRule    String?   // 'daily' | 'weekdays' | 'weekly' | 'monthly' | null for one-shot
+  status            String    @default("pending") // 'pending' | 'processing' | 'sent' | 'failed' | 'cancelled' | 'missed'
+  authorizedAt      DateTime? // Explicit authorization timestamp
+  confirmationToken String?   // Expiration / confirmation token
+  retryCount        Int       @default(0)
+  maxRetries        Int       @default(3)
+  lastError         String?
+  sentAt            DateTime?
+  telegramMsgId     Int?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([status, scheduledFor])
+  @@index([recipientName])
+  @@index([senderAccount, status])
+}
+
+model TelegramRecipient {
+  id          String   @id @default(cuid())
+  name        String   @unique // e.g. 'Dani', 'Sura', 'Simon', 'Kiru', 'Graphics Department'
+  type        String   // 'user' | 'group'
+  chatId      String   // Telegram chat ID (numeric or -100...)
+  username    String?  // Optional username without @
+  aliases     String?  // Comma-separated or JSON list of aliases (e.g. "wife,my wife")
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([name])
+}
+
+
