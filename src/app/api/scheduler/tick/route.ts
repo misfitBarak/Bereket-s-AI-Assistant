@@ -6,12 +6,19 @@ export const dynamic = "force-dynamic";
 
 function isAuthorized(req: NextRequest): boolean {
   const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) return true; // Pass in local development if no secret configured
+  const isProd = process.env.NODE_ENV === "production";
+
+  if (!cronSecret) {
+    if (isProd) {
+      console.error("🔒 Security Alert: CRON_SECRET is not configured in production. Failing closed.");
+      return false; // Fail closed in production
+    }
+    return true; // Pass in local development only if no secret is configured
+  }
+
+  // Header-based authorization: Bearer <CRON_SECRET>
   const authHeader = req.headers.get("authorization");
-  if (authHeader === `Bearer ${cronSecret}`) return true;
-  const url = new URL(req.url);
-  if (url.searchParams.get("secret") === cronSecret) return true;
-  return false;
+  return authHeader === `Bearer ${cronSecret}`;
 }
 
 export async function POST(req: NextRequest) {

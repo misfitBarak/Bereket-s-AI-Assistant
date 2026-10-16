@@ -16,6 +16,7 @@ import {
   Moon,
   Sparkles,
   Users,
+  LogOut,
 } from "lucide-react";
 import { WorkspaceType } from "@/types";
 
@@ -207,20 +208,43 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           </div>
 
-          {!collapsed && (
-            <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 flex items-center gap-3">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold text-xs">
-                Ab
+          {!collapsed ? (
+            <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                  Ab
+                </div>
+                <div className="truncate text-left leading-tight">
+                  <span className="text-xs font-bold text-slate-900 dark:text-white block truncate">
+                    Abbay
+                  </span>
+                  <span className="text-[10px] text-slate-500 block truncate">
+                    Graphics Lead
+                  </span>
+                </div>
               </div>
-              <div className="truncate text-left leading-tight">
-                <span className="text-xs font-bold text-slate-900 dark:text-white block truncate">
-                  Abbay
-                </span>
-                <span className="text-[10px] text-slate-500 block truncate">
-                  Graphics Department Lead
-                </span>
-              </div>
+              <button
+                onClick={async () => {
+                  await fetch("/api/auth/logout", { method: "POST" });
+                  window.location.href = "/login";
+                }}
+                title="Log Out"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-200 dark:hover:bg-slate-700/60 transition flex-shrink-0"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
             </div>
+          ) : (
+            <button
+              onClick={async () => {
+                await fetch("/api/auth/logout", { method: "POST" });
+                window.location.href = "/login";
+              }}
+              title="Log Out"
+              className="p-2 rounded-xl text-slate-500 hover:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center justify-center w-full"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           )}
         </div>
       </aside>

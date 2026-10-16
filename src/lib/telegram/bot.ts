@@ -73,7 +73,13 @@ export function verifyWebhookSecret(
   incomingSecret: string | null | undefined,
   configuredSecret: string
 ): boolean {
-  if (!configuredSecret) return true; // If no secret configured, pass
+  if (!configuredSecret) {
+    if (process.env.NODE_ENV === "production") {
+      console.error("🔒 Security Alert: TELEGRAM_WEBHOOK_SECRET is not configured in production. Failing closed.");
+      return false; // Fail closed in production
+    }
+    return true; // Pass in local development if no secret configured
+  }
   if (!incomingSecret) return false;
   return incomingSecret === configuredSecret;
 }
