@@ -16,7 +16,6 @@ import {
   Moon,
   Sparkles,
   Users,
-  LogOut,
 } from "lucide-react";
 import { WorkspaceType } from "@/types";
 
@@ -223,28 +222,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </span>
                 </div>
               </div>
-              <button
-                onClick={async () => {
-                  await fetch("/api/auth/logout", { method: "POST" });
-                  window.location.href = "/login";
-                }}
-                title="Log Out"
-                className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-200 dark:hover:bg-slate-700/60 transition flex-shrink-0"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-              </button>
+              <div className="flex items-center gap-1.5 flex-shrink-0" title="Active">
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              </div>
             </div>
           ) : (
-            <button
-              onClick={async () => {
-                await fetch("/api/auth/logout", { method: "POST" });
-                window.location.href = "/login";
-              }}
-              title="Log Out"
-              className="p-2 rounded-xl text-slate-500 hover:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center justify-center w-full"
+            <div
+              title="Abbay (Graphics Lead)"
+              className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center justify-center w-full"
             >
-              <LogOut className="w-4 h-4" />
-            </button>
+              <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold text-xs">
+                Ab
+              </div>
+            </div>
           )}
         </div>
       </aside>

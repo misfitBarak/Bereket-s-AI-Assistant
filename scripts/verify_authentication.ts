@@ -56,6 +56,7 @@ async function runTests() {
   const TEST_AUTH_SECRET = "abbay-super-secure-auth-secret-signing-key-2026";
   process.env.APP_PASSWORD = TEST_PASSWORD;
   process.env.AUTH_SECRET = TEST_AUTH_SECRET;
+  process.env.AUTH_ENABLED = "true";
 
   // --- SUITE 1: Password Verification (Timing-safe & Error Handling) ---
   console.log("--- 1. Password Verification & Constant-Time Comparison ---");
@@ -68,34 +69,40 @@ async function runTests() {
   const emptyPassCheck = await verifyPassword("");
   assert(!emptyPassCheck, "Empty password rejected");
 
-  // --- SUITE 2: Session Token Creation, Tampering & Expiry ---
+  // --- SUITE 2: Cryptographic Session Token & Tamper Resistance ---
   console.log("\n--- 2. Cryptographic Session Token Creation & Tamper Resistance ---");
   const sessionToken = await createSessionToken("abbay");
-  assert(Boolean(sessionToken && sessionToken.split(".").length === 3), "Valid 3-part HMAC-SHA256 session token generated");
+  assert(Boolean(sessionToken), "Valid 3-part HMAC-SHA256 session token generated");
+  assert(sessionToken!.split(".").length === 3, "Token conforms to header.payload.signature structure");
 
   const verifyValid = await verifySessionToken(sessionToken);
-  assert(verifyValid.valid && verifyValid.user === "abbay", "Valid session token verifies successfully", `User: ${verifyValid.user}`);
+  assert(verifyValid.valid === true, "Valid session token verifies successfully", `User: ${verifyValid.user}`);
+  assert(verifyValid.user === "abbay", "Session token subject correctly matches 'abbay'");
 
-  // Tamper test: Alter payload
-  const parts = (sessionToken || "").split(".");
-  const tamperedPayload = parts[0] + "." + parts[1].slice(0, -3) + "xyz." + parts[2];
-  const verifyTampered = await verifySessionToken(tamperedPayload);
+  // Tampered payload verification
+  const [headerPart, payloadPart, sigPart] = sessionToken!.split(".");
+  const tamperedPayloadPart = base64UrlEncode(new TextEncoder().encode(JSON.stringify({ sub: "hacker", iat: 100, exp: 9999999999 })));
+  const tamperedToken = `${headerPart}.${tamperedPayloadPart}.${sigPart}`;
+  const verifyTampered = await verifySessionToken(tamperedToken);
   assert(!verifyTampered.valid, "Tampered payload is strictly rejected");
 
-  // Tamper test: Alter signature
-  const tamperedSig = parts[0] + "." + parts[1] + "." + parts[2].slice(0, -4) + "AAAA";
-  const verifyTamperedSig = await verifySessionToken(tamperedSig);
+  // Tampered signature verification
+  const tamperedSigToken = `${headerPart}.${payloadPart}.${sigPart}evil`;
+  const verifyTamperedSig = await verifySessionToken(tamperedSigToken);
   assert(!verifyTamperedSig.valid, "Tampered signature is strictly rejected");
 
-  // Expired token test
-  const expiredPayload = { sub: "abbay", iat: 1000, exp: 2000 };
-  const enc = new TextEncoder();
-  const expPart = base64UrlEncode(enc.encode(JSON.stringify(expiredPayload)));
-  const fakeExpiredToken = `${parts[0]}.${expPart}.${parts[2]}`;
-  const verifyExpired = await verifySessionToken(fakeExpiredToken);
+  // Expired token verification
+  const expiredPayloadPart = base64UrlEncode(new TextEncoder().encode(JSON.stringify({ sub: "abbay", iat: 100, exp: 200 })));
+  const expiredKey = await (async () => {
+    const enc = new TextEncoder();
+    return crypto.subtle.importKey("raw", enc.encode(`abbay-session-v1:${TEST_AUTH_SECRET}`), { name: "HMAC", hash: "SHA-256" }, false, ["sign", "verify"]);
+  })();
+  const expiredSig = base64UrlEncode(new Uint8Array(await crypto.subtle.sign("HMAC", expiredKey, new TextEncoder().encode(`${headerPart}.${expiredPayloadPart}`))));
+  const expiredToken = `${headerPart}.${expiredPayloadPart}.${expiredSig}`;
+  const verifyExpired = await verifySessionToken(expiredToken);
   assert(!verifyExpired.valid, "Expired token is rejected");
 
-  // --- SUITE 3: Login, Logout, and Me API Route Handlers ---
+  // --- SUITE 3: Auth API Route Handlers (/api/auth/login, logout, me) ---
   console.log("\n--- 3. Auth API Route Handlers (/api/auth/login, logout, me) ---");
 
   // Test POST /api/auth/login with wrong password
@@ -118,10 +125,10 @@ async function runTests() {
 
   const setCookieHeader = successLoginRes.headers.get("set-cookie") || "";
   assert(setCookieHeader.includes(SESSION_COOKIE_NAME), "Login sets abbay_auth_session cookie");
-  assert(setCookieHeader.includes("HttpOnly") || setCookieHeader.includes("httponly"), "Session cookie is HttpOnly");
-  assert(/samesite=strict/i.test(setCookieHeader), "Session cookie is SameSite=Strict");
+  assert(setCookieHeader.toLowerCase().includes("httponly"), "Session cookie is HttpOnly");
+  assert(setCookieHeader.toLowerCase().includes("samesite=strict"), "Session cookie is SameSite=Strict");
 
-  // Extract token from cookie header
+  // Extract cookie value for subsequent tests
   const match = setCookieHeader.match(new RegExp(`${SESSION_COOKIE_NAME}=([^;]+)`));
   const cookieValue = match ? match[1] : "";
 
@@ -140,10 +147,11 @@ async function runTests() {
 
   // Test POST /api/auth/logout
   const logoutRes = await logoutHandler();
+  assert(logoutRes.status === 200, "POST /api/auth/logout returns 200");
   const logoutCookie = logoutRes.headers.get("set-cookie") || "";
   assert(logoutCookie.includes("Max-Age=0") || logoutCookie.includes("max-age=0") || logoutCookie.includes("Expires="), "POST /api/auth/logout invalidates session cookie");
 
-  // --- SUITE 4: Next.js Middleware Route Protection ---
+  // --- SUITE 4: Next.js Middleware Protection (APIs & Pages) ---
   console.log("\n--- 4. Next.js Middleware Protection (APIs & Pages) ---");
 
   // 1. Unauthenticated API requests must return 401
@@ -161,16 +169,16 @@ async function runTests() {
   ];
 
   for (const apiPath of protectedApis) {
-    const unauthReq = new NextRequest(`http://localhost:3000${apiPath}`);
-    const mwRes = await middleware(unauthReq);
-    assert(mwRes.status === 401, `Unauthenticated request to ${apiPath} returns 401`);
+    const unauthApiReq = new NextRequest(`http://localhost:3000${apiPath}`);
+    const unauthApiRes = await middleware(unauthApiReq);
+    assert(unauthApiRes.status === 401, `Unauthenticated request to ${apiPath} returns 401`);
   }
 
   // 2. Unauthenticated page requests must redirect to /login
   const unauthPageReq = new NextRequest("http://localhost:3000/");
-  const mwPageRes = await middleware(unauthPageReq);
-  assert(mwPageRes.status === 307 || mwPageRes.status === 302, "Unauthenticated dashboard visit redirects");
-  const redirectLocation = mwPageRes.headers.get("location") || "";
+  const unauthPageRes = await middleware(unauthPageReq);
+  assert(unauthPageRes.status === 307 || unauthPageRes.status === 302, "Unauthenticated dashboard visit redirects");
+  const redirectLocation = unauthPageRes.headers.get("location") || "";
   assert(redirectLocation.includes("/login"), "Unauthenticated dashboard visit redirects specifically to /login");
 
   // 3. Authenticated requests with valid cookie must pass
@@ -330,6 +338,33 @@ async function runTests() {
 
   // Redirect loop protection
   assert(getSafeRedirectUrl("/login") === "/", "Prevents redirect loop back to /login");
+
+  // --- SUITE 9: Open-Access Bypass Mode (AUTH_ENABLED is false/unset) ---
+  console.log("\n--- 9. Open-Access Bypass Mode (Login Gate Disabled) ---");
+  delete process.env.AUTH_ENABLED;
+
+  const openDashReq = new NextRequest("http://localhost:3000/");
+  const openDashRes = await middleware(openDashReq);
+  assert(openDashRes.status === 200, "Dashboard / opens directly without login or session");
+
+  const openApiReq = new NextRequest("http://localhost:3000/api/tasks");
+  const openApiRes = await middleware(openApiReq);
+  assert(openApiRes.status === 200, "API route /api/tasks is accessible directly without login");
+
+  const loginBypassReq = new NextRequest("http://localhost:3000/login");
+  const loginBypassRes = await middleware(loginBypassReq);
+  assert(
+    loginBypassRes.status === 307 || loginBypassRes.status === 302,
+    "Visiting /login redirects directly to / when login requirement is removed"
+  );
+
+  const openMeReq = new NextRequest("http://localhost:3000/api/auth/me");
+  const openMeRes = await meHandler(openMeReq);
+  const openMeData = await openMeRes.json();
+  assert(
+    openMeRes.status === 200 && openMeData.authenticated === true && openMeData.authRequired === false,
+    "GET /api/auth/me reports authenticated: true and authRequired: false in open-access mode"
+  );
 
   // Restore environment
   (process.env as any).NODE_ENV = origEnv;

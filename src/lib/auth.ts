@@ -8,6 +8,15 @@
 export const SESSION_COOKIE_NAME = "abbay_auth_session";
 export const SESSION_MAX_AGE_SECONDS = 30 * 24 * 60 * 60; // 30 days
 
+/**
+ * Global authentication gate toggle.
+ * When false (default), login screens and session checks are bypassed across the app (dashboard opens directly).
+ * Can be explicitly re-enabled by setting AUTH_ENABLED="true" in environment variables.
+ */
+export function isAuthEnabled(): boolean {
+  return process.env.AUTH_ENABLED === "true";
+}
+
 // Helper for Base64URL encoding/decoding without external dependencies
 export function base64UrlEncode(bytes: Uint8Array): string {
   let binary = "";
@@ -24,7 +33,7 @@ export function base64UrlDecode(str: string): Uint8Array {
   while (base64.length % 4) {
     base64 += "=";
   }
-  const binary = typeof atob === "function" ? atob(base64) : Buffer.from(base64, "base64").toString("binary");
+  const binary = typeof atob === "function" ? atob(base64) : Buffer.from(base64, "binary").toString("binary");
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) {
     bytes[i] = binary.charCodeAt(i);
@@ -34,9 +43,12 @@ export function base64UrlDecode(str: string): Uint8Array {
 
 /**
  * Retrieves the required server-side password.
- * Fails closed if missing in production.
+ * Fails closed if missing in production when authentication is enabled.
  */
 export function getAppPassword(): string | null {
+  if (!isAuthEnabled()) {
+    return null;
+  }
   const pwd = process.env.APP_PASSWORD;
   if (!pwd || pwd.trim().length === 0) {
     if (process.env.NODE_ENV === "production") {
@@ -74,7 +86,7 @@ export async function verifyPassword(inputPassword: string): Promise<boolean> {
 
 /**
  * Retrieves the dedicated session signing secret (AUTH_SECRET).
- * In production: strictly requires process.env.AUTH_SECRET and fails closed if missing or empty.
+ * In production: strictly requires process.env.AUTH_SECRET and fails closed if missing or empty when auth is enabled.
  * Never falls back to APP_PASSWORD in production.
  * In development/test: falls back to a development secret if unset.
  */
@@ -86,7 +98,7 @@ export function getAuthSecret(): string | null {
     return secret.trim();
   }
 
-  if (isProd) {
+  if (isProd && isAuthEnabled()) {
     console.error("🔒 Security Alert: AUTH_SECRET is not configured in production. Failing closed.");
     return null;
   }
@@ -306,4 +318,3 @@ export function getSafeRedirectUrl(target: string | null | undefined): string {
     return "/";
   }
 }
-

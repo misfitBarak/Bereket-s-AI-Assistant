@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Lock, Sparkles, AlertCircle, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { getSafeRedirectUrl } from "@/lib/auth";
 
@@ -9,6 +9,18 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // If authentication is disabled, automatically forward directly to dashboard
+    fetch("/api/auth/me")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data.authRequired || data.authenticated) {
+          window.location.replace("/");
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

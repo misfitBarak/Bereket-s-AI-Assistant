@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifySessionToken, SESSION_COOKIE_NAME } from "@/lib/auth";
+import { isAuthEnabled, verifySessionToken, SESSION_COOKIE_NAME } from "@/lib/auth";
 
 export const config = {
   matcher: [
@@ -15,6 +15,14 @@ export const config = {
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  // When authentication is disabled, automatically forward any /login visits directly to dashboard
+  if (!isAuthEnabled()) {
+    if (pathname === "/login") {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+    return NextResponse.next();
+  }
 
   // 1. Authentication endpoints & Login page
   if (
