@@ -8,6 +8,8 @@ import {
   Users,
   Sparkles,
   TrendingUp,
+  Award,
+  Zap,
   Plus,
   Tv,
   Calendar,
@@ -81,6 +83,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     financials = { totalQuoted: 0, totalPaid: 0, pendingBalance: 0, currency: "ETB" },
     teamWorkload = [],
     workspaceStats = {},
+    sevenDayReport = null,
   } = stats || {};
 
   return (
@@ -166,11 +169,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </div>
           <div className="text-2xl font-bold text-slate-900 dark:text-white">
-            {teamWorkload.length}{" "}
-            <span className="text-xs font-normal text-slate-500">artists active</span>
+            4 <span className="text-xs font-normal text-slate-500">artists active</span>
           </div>
           <div className="mt-2 text-xs text-indigo-600 dark:text-indigo-400 font-medium">
-            Dani, Sura, Simon, Kiru, Bereket
+            Dani, Sura (Graphic) • Kiru, Simon (Motion)
           </div>
         </div>
 
@@ -294,58 +296,151 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           )}
         </div>
 
-        {/* Graphics Department Team Workload Overview (1 Col) */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xs">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Tv className="w-4 h-4 text-blue-600" />
-              <h2 className="text-base font-bold text-slate-900 dark:text-white">
-                Team Workload
-              </h2>
-            </div>
-            <button
-              onClick={() => onNavigateTab("abbay_tv")}
-              className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium"
-            >
-              Manage
-            </button>
-          </div>
-
-          <p className="text-xs text-slate-500 mb-4">
-            Current assigned hours vs weekly capacity for Graphics Department artists.
-          </p>
-
-          <div className="space-y-4">
-            {teamWorkload.map((m: any) => (
-              <div key={m.id} className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">
-                    {m.name}
-                  </span>
-                  <span
-                    className={`font-mono text-[11px] ${
-                      m.isOverloaded
-                        ? "text-red-600 dark:text-red-400 font-bold"
-                        : "text-slate-500 dark:text-slate-400"
-                    }`}
-                  >
-                    {m.assignedHours}h / {m.capacity}h ({m.loadPercentage}%)
-                  </span>
-                </div>
-                <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      m.isOverloaded
-                        ? "bg-red-500"
-                        : m.loadPercentage > 70
-                        ? "bg-amber-500"
-                        : "bg-blue-600"
-                    }`}
-                    style={{ width: `${Math.min(m.loadPercentage, 100)}%` }}
-                  />
-                </div>
+        {/* Rolling 7-Day Team Output & Performance (1 Col) */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Award className="w-4 h-4 text-amber-500" />
+                <h2 className="text-base font-bold text-slate-900 dark:text-white">
+                  7-Day Output & Performance
+                </h2>
               </div>
-            ))}
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                Last 7 Days
+              </span>
+            </div>
+
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">
+              Live rolling output based on creative deliverable weight (Media Packs = Heavy, Promos = Medium, Posters = Light). No punch-clock hours.
+            </p>
+
+            {/* Performance Leaderboard */}
+            <div className="space-y-4">
+              {/* 1. Graphic Designers Group (Dani, Sura) */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                    Graphic Designers
+                  </span>
+                  <span className="text-[10px] text-slate-400">Creative Score</span>
+                </div>
+
+                {((sevenDayReport?.artists || []).filter((a: any) => a.group === "Graphic Designer").length > 0
+                  ? (sevenDayReport?.artists || []).filter((a: any) => a.group === "Graphic Designer")
+                  : [
+                      { id: "dani", name: "Dani", role: "Graphic Designer & 3D Artist", outputScore: 0, relativePercent: 0, isTopPerformer: false, status: "AVAILABLE" },
+                      { id: "sura", name: "Sura", role: "Graphic Designer & Video Editor", outputScore: 0, relativePercent: 0, isTopPerformer: false, status: "AVAILABLE" },
+                    ]
+                ).map((artist: any) => (
+                  <div key={artist.name} className="p-2.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-xs text-slate-900 dark:text-white">
+                          {artist.name}
+                        </span>
+                        {artist.isTopPerformer && (
+                          <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-700 flex items-center gap-1">
+                            🔥 Top Performer
+                          </span>
+                        )}
+                        <span
+                          className={`text-[9px] font-semibold px-1.5 py-0.2 rounded ${
+                            artist.status === "DEEP_FOCUS"
+                              ? "bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300"
+                              : artist.status === "BALANCED"
+                              ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
+                              : "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
+                          }`}
+                        >
+                          {artist.status === "DEEP_FOCUS" ? "Deep Focus" : artist.status === "BALANCED" ? "Balanced" : "Available"}
+                        </span>
+                      </div>
+                      <span className="font-mono text-xs font-bold text-slate-800 dark:text-slate-200">
+                        {artist.outputScore} pts
+                      </span>
+                    </div>
+
+                    {/* Output progress bar */}
+                    <div className="w-full h-2 rounded-full bg-slate-200/80 dark:bg-slate-700/80 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-blue-600 via-indigo-500 to-amber-500 transition-all duration-500"
+                        style={{ width: `${Math.max(artist.relativePercent, artist.outputScore > 0 ? 15 : 4)}%` }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                      <span>{artist.role}</span>
+                      <span>
+                        {artist.outputScore === 0 ? "No deliverables completed yet" : `${artist.completedCount} finished | ${artist.activeCount} active`}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* 2. Motion Graphic Designers Group (Kiru, Simon) */}
+              <div className="space-y-3 pt-1">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
+                    Motion Graphic Designers
+                  </span>
+                  <span className="text-[10px] text-slate-400">Creative Score</span>
+                </div>
+
+                {((sevenDayReport?.artists || []).filter((a: any) => a.group === "Motion Graphic Designer").length > 0
+                  ? (sevenDayReport?.artists || []).filter((a: any) => a.group === "Motion Graphic Designer")
+                  : [
+                      { id: "kiru", name: "Kiru", role: "Motion Graphic Designer & Digital Artist", outputScore: 0, relativePercent: 0, isTopPerformer: false, status: "AVAILABLE" },
+                      { id: "simon", name: "Simon", role: "Motion Graphic Designer & Broadcast Specialist", outputScore: 0, relativePercent: 0, isTopPerformer: false, status: "AVAILABLE" },
+                    ]
+                ).map((artist: any) => (
+                  <div key={artist.name} className="p-2.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-xs text-slate-900 dark:text-white">
+                          {artist.name}
+                        </span>
+                        {artist.isTopPerformer && (
+                          <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-700 flex items-center gap-1">
+                            🔥 Top Performer
+                          </span>
+                        )}
+                        <span
+                          className={`text-[9px] font-semibold px-1.5 py-0.2 rounded ${
+                            artist.status === "DEEP_FOCUS"
+                              ? "bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300"
+                              : artist.status === "BALANCED"
+                              ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
+                              : "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
+                          }`}
+                        >
+                          {artist.status === "DEEP_FOCUS" ? "Deep Focus" : artist.status === "BALANCED" ? "Balanced" : "Available"}
+                        </span>
+                      </div>
+                      <span className="font-mono text-xs font-bold text-slate-800 dark:text-slate-200">
+                        {artist.outputScore} pts
+                      </span>
+                    </div>
+
+                    {/* Output progress bar */}
+                    <div className="w-full h-2 rounded-full bg-slate-200/80 dark:bg-slate-700/80 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-purple-600 via-indigo-500 to-blue-500 transition-all duration-500"
+                        style={{ width: `${Math.max(artist.relativePercent, artist.outputScore > 0 ? 15 : 4)}%` }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                      <span>{artist.role}</span>
+                      <span>
+                        {artist.outputScore === 0 ? "No deliverables completed yet" : `${artist.completedCount} finished | ${artist.activeCount} active`}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
@@ -353,7 +448,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               onClick={() => onNavigateTab("chat")}
               className="w-full text-center text-xs py-2 px-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/40 font-medium transition"
             >
-              Ask AI to Balance Workload
+              Ask AI for 7-Day Performance Analysis
             </button>
           </div>
         </div>

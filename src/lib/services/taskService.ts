@@ -34,6 +34,39 @@ export interface TeamWorkloadMember {
   tasks: Array<{ id: string; title: string; priority: string; estimatedHours: number; dueDate: string | null }>;
 }
 
+
+export interface ArtistOutputReport {
+  id: string;
+  name: string;
+  role: string;
+  group: "Graphic Designer" | "Motion Graphic Designer";
+  outputScore: number;
+  relativePercent: number;
+  completedCount: number;
+  activeCount: number;
+  heavyDeliverablesCount: number;
+  mediumDeliverablesCount: number;
+  lightDeliverablesCount: number;
+  status: "DEEP_FOCUS" | "BALANCED" | "AVAILABLE";
+  isTopPerformer: boolean;
+  recentDeliverables: Array<{
+    title: string;
+    tier: "heavy" | "medium" | "light";
+    points: number;
+    status: string;
+    completedAt?: string | null;
+  }>;
+}
+
+export interface SevenDayTeamPerformanceReport {
+  startDate: string;
+  endDate: string;
+  artists: ArtistOutputReport[];
+  topPerformerName: string | null;
+  totalDepartmentScore: number;
+  totalCompletedLast7Days: number;
+}
+
 export interface DepartmentWorkloadReport {
   department: string;
   lead: string;
@@ -201,10 +234,237 @@ export async function getActiveTasks(options: {
  * Calculates live department workload strictly from database records.
  * Generates data-driven balancing recommendations based on real capacity and open tasks.
  */
-export async function getDepartmentWorkload(anchorDate: Date = new Date()): Promise<DepartmentWorkloadReport> {
-  const team = await db.teamMember.findMany({
-    orderBy: { name: "asc" },
+
+/**
+ * Calculates the creative weight and effort points for a deliverable.
+ * - Heavy (8 pts): Multi-page sponsorship media packs, 3D broadcast packages, station idents.
+ * - Medium (4 pts): 15-30s promos, lower thirds, L-shapes, show bumpers, video cutdowns.
+ * - Light (2 pts): Social media posters, YouTube thumbnails, digital flyers, quick resizes.
+ */
+export function getTaskWeightPoints(task: {
+  title: string;
+  deliverableType?: string | null;
+  priority?: string | null;
+}): {
+  points: number;
+  tier: "heavy" | "medium" | "light";
+  label: string;
+} {
+  const text = `${task.title} ${task.deliverableType || ""}`.toLowerCase();
+
+  // Heavy: 8 points
+  if (
+    text.includes("media pack") ||
+    text.includes("sponsorship") ||
+    text.includes("ident") ||
+    text.includes("3d") ||
+    text.includes("title sequence") ||
+    text.includes("rebrand") ||
+    text.includes("package")
+  ) {
+    return { points: 8, tier: "heavy", label: "Heavy (Multi-Page / 3D Package)" };
+  }
+
+  // Medium: 4 points
+  if (
+    text.includes("promo") ||
+    text.includes("advert") ||
+    text.includes("teaser") ||
+    text.includes("lower third") ||
+    text.includes("l-shape") ||
+    text.includes("bumper") ||
+    text.includes("strap") ||
+    text.includes("reel") ||
+    text.includes("cutdown") ||
+    text.includes("short")
+  ) {
+    return { points: 4, tier: "medium", label: "Medium (Broadcast Promo / Template)" };
+  }
+
+  // Light: 2 points
+  if (
+    text.includes("poster") ||
+    text.includes("thumbnail") ||
+    text.includes("banner") ||
+    text.includes("flyer") ||
+    text.includes("social") ||
+    text.includes("resize")
+  ) {
+    return { points: 2, tier: "light", label: "Light (Single Artboard / Graphic)" };
+  }
+
+  if (task.priority === "urgent") {
+    return { points: 6, tier: "heavy", label: "Urgent Priority Deliverable" };
+  }
+
+  return { points: 3, tier: "medium", label: "Standard Deliverable" };
+}
+
+/**
+ * Generates rolling last 7 days team output & performance metrics.
+ * Evaluates Dani, Sura, Kiru, Simon in exact order without punch-clock hours.
+ */
+export async function getRollingSevenDayTeamOutput(
+  anchorDate: Date = new Date()
+): Promise<SevenDayTeamPerformanceReport> {
+  const sevenDaysAgo = new Date(anchorDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+  const team = await db.teamMember.findMany();
+  // Filter out Bereket (Lead) so only production artists are evaluated
+  const artistsOnly = team.filter((m) => m.name.toLowerCase() !== "bereket");
+
+  // Exact custom ordering requested by Bereket:
+  // Dani, Sura (Graphic Designers)
+  // Kiru, Simon (Motion Graphic Designers)
+  const ARTIST_ORDER = ["Dani", "Sura", "Kiru", "Simon"];
+  artistsOnly.sort((a, b) => {
+    const idxA = ARTIST_ORDER.indexOf(a.name);
+    const idxB = ARTIST_ORDER.indexOf(b.name);
+    return (idxA !== -1 ? idxA : 99) - (idxB !== -1 ? idxB : 99);
   });
+
+  const allTvTasks = await db.task.findMany({
+    where: {
+      workspace: "abbay_tv",
+      OR: [
+        { status: "completed", completedAt: { gte: sevenDaysAgo } },
+        { status: { not: "completed" } },
+      ],
+    },
+    orderBy: [{ completedAt: "desc" }, { priority: "desc" }, { updatedAt: "desc" }],
+  });
+
+  let maxPoints = 1;
+  let totalDepartmentScore = 0;
+  let totalCompletedLast7Days = 0;
+
+  const artistReports: ArtistOutputReport[] = artistsOnly.map((member) => {
+    const nameLower = member.name.toLowerCase();
+    const assignedTasks = allTvTasks.filter(
+      (t) => t.assignedTo && t.assignedTo.toLowerCase().includes(nameLower)
+    );
+
+    const completedLast7Days = assignedTasks.filter(
+      (t) => t.status === "completed" && t.completedAt && new Date(t.completedAt) >= sevenDaysAgo
+    );
+    const activeTasks = assignedTasks.filter((t) => t.status !== "completed");
+
+    let completedPoints = 0;
+    let heavyCount = 0;
+    let mediumCount = 0;
+    let lightCount = 0;
+
+    const recentDeliverables: Array<{
+      title: string;
+      tier: "heavy" | "medium" | "light";
+      points: number;
+      status: string;
+      completedAt?: string | null;
+    }> = [];
+
+    completedLast7Days.forEach((t) => {
+      const weight = getTaskWeightPoints(t);
+      completedPoints += weight.points;
+      if (weight.tier === "heavy") heavyCount++;
+      else if (weight.tier === "medium") mediumCount++;
+      else lightCount++;
+
+      recentDeliverables.push({
+        title: t.title,
+        tier: weight.tier,
+        points: weight.points,
+        status: "completed",
+        completedAt: t.completedAt ? t.completedAt.toISOString() : null,
+      });
+    });
+
+    let activePoints = 0;
+    activeTasks.forEach((t) => {
+      const weight = getTaskWeightPoints(t);
+      activePoints += Math.round(weight.points * 0.5);
+      if (weight.tier === "heavy") heavyCount++;
+      else if (weight.tier === "medium") mediumCount++;
+      else lightCount++;
+
+      recentDeliverables.push({
+        title: t.title,
+        tier: weight.tier,
+        points: weight.points,
+        status: t.status,
+      });
+    });
+
+    const outputScore = completedPoints + activePoints;
+    if (outputScore > maxPoints) maxPoints = outputScore;
+    totalDepartmentScore += outputScore;
+    totalCompletedLast7Days += completedLast7Days.length;
+
+    const isGraphicDesigner = member.name.toLowerCase() === "dani" || member.name.toLowerCase() === "sura";
+    const group: "Graphic Designer" | "Motion Graphic Designer" = isGraphicDesigner
+      ? "Graphic Designer"
+      : "Motion Graphic Designer";
+
+    let status: "DEEP_FOCUS" | "BALANCED" | "AVAILABLE" = "AVAILABLE";
+    if (activeTasks.some((t) => getTaskWeightPoints(t).tier === "heavy")) {
+      status = "DEEP_FOCUS";
+    } else if (activeTasks.length >= 2 || outputScore >= 6) {
+      status = "BALANCED";
+    }
+
+    return {
+      id: member.id,
+      name: member.name,
+      role: member.role,
+      group,
+      outputScore,
+      relativePercent: 0,
+      completedCount: completedLast7Days.length,
+      activeCount: activeTasks.length,
+      heavyDeliverablesCount: heavyCount,
+      mediumDeliverablesCount: mediumCount,
+      lightDeliverablesCount: lightCount,
+      status,
+      isTopPerformer: false,
+      recentDeliverables: recentDeliverables.slice(0, 3),
+    };
+  });
+
+  let topPerformerName: string | null = null;
+  let highestScore = 0;
+  artistReports.forEach((a) => {
+    if (a.outputScore > highestScore) {
+      highestScore = a.outputScore;
+      topPerformerName = a.name;
+    }
+  });
+
+  artistReports.forEach((a) => {
+    a.relativePercent = maxPoints > 0 ? Math.round((a.outputScore / Math.max(maxPoints, 10)) * 100) : 0;
+    if (topPerformerName && a.name === topPerformerName && highestScore > 0) {
+      a.isTopPerformer = true;
+    }
+  });
+
+  return {
+    startDate: sevenDaysAgo.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+    endDate: anchorDate.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+    artists: artistReports,
+    topPerformerName,
+    totalDepartmentScore,
+    totalCompletedLast7Days,
+  };
+}
+
+export async function getDepartmentWorkload(anchorDate: Date = new Date()): Promise<DepartmentWorkloadReport> {
+  const ARTIST_ORDER = ["Dani", "Sura", "Kiru", "Simon"];
+  const allTeam = await db.teamMember.findMany();
+  const team = allTeam
+    .filter((m) => m.name.toLowerCase() !== "bereket")
+    .sort((a, b) => {
+      const idxA = ARTIST_ORDER.indexOf(a.name);
+      const idxB = ARTIST_ORDER.indexOf(b.name);
+      return (idxA !== -1 ? idxA : 99) - (idxB !== -1 ? idxB : 99);
+    });
 
   const activeTvTasks = await db.task.findMany({
     where: {

@@ -1,21 +1,21 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { getTaskMetrics, getDepartmentWorkload } from "@/lib/services/taskService";
+import {
+  getTaskMetrics,
+  getDepartmentWorkload,
+  getRollingSevenDayTeamOutput,
+} from "@/lib/services/taskService";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
     const now = new Date();
-    const [metrics, workloadReport, allProjects] = await Promise.all([
+    const [metrics, workloadReport, sevenDayReport] = await Promise.all([
       getTaskMetrics(now),
       getDepartmentWorkload(now),
-      db.project.findMany(),
+      getRollingSevenDayTeamOutput(now),
     ]);
-
-    const totalQuoted = 0;
-    const totalPaid = 0;
-    const pendingBalance = 0;
 
     return NextResponse.json({
       success: true,
@@ -31,12 +31,7 @@ export async function GET() {
         upcomingDeadlines: metrics.upcomingDeadlines,
         workspaceStats: metrics.byWorkspace,
         clientProjectsCount: 0,
-        financials: {
-          totalQuoted,
-          totalPaid,
-          pendingBalance,
-          currency: "ETB",
-        },
+        sevenDayReport,
         teamWorkload: workloadReport.team.map((m) => ({
           id: m.id,
           name: m.name,

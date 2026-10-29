@@ -117,7 +117,12 @@ export const AbbayTvView: React.FC<AbbayTvViewProps> = ({ onOpenTaskModal, onNav
 ---
 
 ### 1. Executive Summary
-The Graphics Department maintained uninterrupted on-air deliverables for Abbay TV's weekly broadcast lineup. All daily prime-time news straps, promotional teasers, and station idents adhered to national broadcast-safe color standards and title-safe margins.
+The Graphics Department maintained uninterrupted on-air deliverables for Abbay TV's weekly broadcast lineup.
+Production Team:
+• Graphic Designers: Dani, Sura
+• Motion Graphic Designers: Kiru, Simon
+
+Output was evaluated based on deliverable creative weight (sponsorship media packs, 3D broadcast packages, promotional teasers, and digital posters) to ensure balanced department execution without punch-clock distortion.
 
 ---
 
@@ -231,7 +236,7 @@ ${team.map((m) => `- **${m.name}** (${m.role}): Assigned ${m.totalAssignedHours 
               : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
           }`}
         >
-          Team Roster & Workload ({team.length})
+          Artist Roster ({team.filter((m: any) => m.name !== "Bereket").length})
         </button>
         <button
           onClick={() => {
@@ -410,7 +415,15 @@ ${team.map((m) => `- **${m.name}** (${m.role}): Assigned ${m.totalAssignedHours 
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {team.map((member) => (
+            {[...team]
+              .filter((m) => m.name.toLowerCase() !== "bereket")
+              .sort((a, b) => {
+                const order = ["Dani", "Sura", "Kiru", "Simon"];
+                const idxA = order.indexOf(a.name);
+                const idxB = order.indexOf(b.name);
+                return (idxA !== -1 ? idxA : 99) - (idxB !== -1 ? idxB : 99);
+              })
+              .map((member) => (
               <div
                 key={member.id}
                 className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-2xs space-y-4"
@@ -452,25 +465,16 @@ ${team.map((m) => `- **${m.name}** (${m.role}): Assigned ${m.totalAssignedHours 
 
                 <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-500">Weekly Capacity:</span>
-                    <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">
-                      {member.totalAssignedHours || 0}h / {member.currentCapacityHours}h
+                    <span className="text-slate-500">Department Role:</span>
+                    <span className="font-semibold text-xs text-blue-600 dark:text-blue-400">
+                      {member.name === "Dani" || member.name === "Sura" ? "Graphic Designer" : "Motion Graphic Designer"}
                     </span>
                   </div>
-                  <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${
-                        (member.totalAssignedHours || 0) > member.currentCapacityHours
-                          ? "bg-red-500"
-                          : "bg-blue-600"
-                      }`}
-                      style={{
-                        width: `${Math.min(
-                          Math.round(((member.totalAssignedHours || 0) / member.currentCapacityHours) * 100),
-                          100
-                        )}%`,
-                      }}
-                    />
+                  <div className="flex items-center justify-between text-xs text-slate-500">
+                    <span>Active Queue:</span>
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">
+                      {member.activeTaskCount || 0} assigned deliverable{(member.activeTaskCount || 0) === 1 ? "" : "s"}
+                    </span>
                   </div>
                 </div>
 
