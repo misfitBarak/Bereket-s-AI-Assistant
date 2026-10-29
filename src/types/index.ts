@@ -68,6 +68,36 @@ export interface TeamMemberItem {
   totalAssignedHours?: number;
 }
 
+export interface AchievementItem {
+  id: string;
+  title: string;
+  description?: string | null;
+  category: "abbay_tv" | "client_work" | "personal_projects" | "career";
+  type: "milestone" | "deliverable" | "revenue" | "breakthrough";
+  metric?: string | null;
+  impact: "medium" | "high" | "major" | "breakthrough";
+  achievedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GrowthMetrics {
+  totalCompletedDeliverables: number;
+  totalProjectsCompleted: number;
+  totalClientRevenue: number;
+  majorBreakthroughsCount: number;
+  recentMilestones: AchievementItem[];
+  recentProgress: {
+    id: string;
+    type: "task" | "project" | "achievement";
+    title: string;
+    workspace: string;
+    date: string;
+    detail: string;
+    badge?: string;
+  }[];
+}
+
 export interface MemoryItem {
   id: string;
   category:

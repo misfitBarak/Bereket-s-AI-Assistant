@@ -11,6 +11,7 @@ import {
   Tv,
   Briefcase,
   TrendingUp,
+  Award,
 } from "lucide-react";
 
 interface HeaderProps {
@@ -61,10 +62,10 @@ export const Header: React.FC<HeaderProps> = ({
       subtitle: "YouTube masterclass, motion presets & AI pipelines",
       icon: TrendingUp,
     },
-    memories: {
-      title: "Personal Memory System",
-      subtitle: "Inspect and edit persistent assistant knowledge",
-      icon: null,
+    growth: {
+      title: "Growth & Accomplishments",
+      subtitle: "Major milestones, deliverable breakthroughs, progress updates, and career growth",
+      icon: Award,
     },
     settings: {
       title: "System Settings",

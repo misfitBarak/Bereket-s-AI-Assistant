@@ -40,22 +40,11 @@ export async function processUserMessage(
       content: m.content,
     }));
 
-  // 3. Dynamic context retrieval: Match memories by search terms + high-importance items
-  const terms = userMessage.toLowerCase().split(/\s+/).filter((w) => w.length > 3);
-  const allMemories = await db.memory.findMany({
-    orderBy: [{ importance: "desc" }, { updatedAt: "desc" }],
-    take: 15,
+  // 3. Dynamic context retrieval: Match recent accomplishments & growth milestones
+  const recentAchievements = await db.achievement.findMany({
+    orderBy: [{ achievedAt: "desc" }],
+    take: 6,
   });
-
-  const matchedMemories = allMemories.filter((m) =>
-    terms.some(
-      (t) =>
-        m.title.toLowerCase().includes(t) ||
-        m.content.toLowerCase().includes(t) ||
-        m.tags?.toLowerCase().includes(t)
-    )
-  );
-  const relevantMemories = Array.from(new Set([...matchedMemories, ...allMemories])).slice(0, 8);
 
   // 4. Retrieve live department roster and active projects for grounding
   const [teamMembers, activeProjects] = await Promise.all([
@@ -83,8 +72,8 @@ ${teamMembers.map((m) => `- ${m.name} (${m.role}): Status=${m.status}, Capacity=
 Active Workspaces & Projects:
 ${activeProjects.map((p) => `- [${p.workspace.toUpperCase()}] ${p.title} (${p.clientName ? `Client: ${p.clientName}, ` : ""}${p.progress}% done)`).join("\n")}
 
-Persistent Knowledge & Decisions from Memory:
-${relevantMemories.map((m) => `[${m.category}] ${m.title}: ${m.content}`).join("\n")}
+Recent Accomplishments & Milestones:
+${recentAchievements.length === 0 ? "No accomplishments recorded yet (system clean)." : recentAchievements.map((a) => `- [${a.category.toUpperCase()}] ${a.title} (${a.metric || ""})`).join("\n")}
 
 CRITICAL OPERATIONAL RULES:
 1. TRUTHFULNESS & GROUNDING: Ground every single answer in live database records. Always invoke the provided tools to query tasks, workload, projects, and memories before making statements. NEVER fabricate percentages (such as "65% done" unless returned by a project record), deadlines, hours, or artist capacity.
@@ -873,7 +862,7 @@ async function runAutonomousLocalEngine(
     lower.startsWith("create task") ||
     (lower.includes("task for") && lower.includes("finish"))
   ) {
-    let assignedTo = "Abbay";
+    let assignedTo = "Bereket";
     if (lower.includes("dani")) assignedTo = "Dani";
     else if (lower.includes("sura")) assignedTo = "Sura";
     else if (lower.includes("simon")) assignedTo = "Simon";
@@ -1121,6 +1110,31 @@ async function runAutonomousLocalEngine(
     });
   }
 
+  // 10. Growth & Accomplishments: "What changed", "Show my accomplishments"
+  if (lower.includes("accomplish") || lower.includes("growth") || lower.includes("achievement") || lower.includes("milestone") || lower.includes("what changed")) {
+    let content = `### 🏆 Growth, Milestones & Major Accomplishments\n\n`;
+    const achievements = await db.achievement.findMany({ orderBy: { achievedAt: "desc" }, take: 10 });
+    const completedTasks = await db.task.findMany({ where: { status: "completed" }, take: 5 });
+
+    if (achievements.length === 0 && completedTasks.length === 0) {
+      content += `No accomplishments or completed deliverables are currently logged in your command center.\n\nAs you complete tasks on your boards, deliver broadcast packages, and achieve client milestones, your growth and what changed will be compiled here automatically!`;
+    } else {
+      content += `Here is your recent progress and major accomplishments:\n\n`;
+      achievements.forEach((a) => {
+        content += `- **${a.title}** (${a.category}) ${a.metric ? `— \`${a.metric}\`` : ""} [${a.impact.toUpperCase()}]\n`;
+      });
+      completedTasks.forEach((t) => {
+        content += `- ✅ **Delivered:** ${t.title} (${t.workspace}) — Delivered by ${t.assignedTo || "Team"}\n`;
+      });
+    }
+    return wrapResponse({
+      content,
+      toolCalls: [],
+      toolResults: [],
+      isProcessed: true,
+    });
+  }
+
   // 10. Memory Recall: "Remind me what I decided about my last project"
   if (lower.includes("decid") || lower.includes("remind") || lower.includes("memor")) {
     let query = "decisions";
@@ -1133,14 +1147,14 @@ async function runAutonomousLocalEngine(
 
     let content = `### 🧠 Memory Retrieval: Stored Knowledge & Past Decisions\n\n`;
     if (!memories || memories.length === 0) {
-      content += `I checked your stored memory repository, but couldn't find a recent record matching "${query}". You can record new instructions anytime in your Personal Memory interface.`;
+      content += `I checked your stored records, but couldn't find a record matching "${query}". You can inspect recent updates in your Growth & Accomplishments tab.`;
     } else {
       content += `Here is what was retrieved from your persistent memory store:\n\n`;
       memories.forEach((m: any) => {
         content += `#### 📌 ${m.title} (${m.category})\n`;
         content += `${m.content}\n\n`;
       });
-      content += `*You can inspect, update, or delete these notes in your Personal Memory tab.*`;
+      content += `*You can inspect, update, or track milestones in your Growth & Accomplishments tab.*`;
     }
 
     return wrapResponse({

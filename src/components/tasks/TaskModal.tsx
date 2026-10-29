@@ -42,7 +42,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
       setStatus(initialTask.status || "todo");
       setPriority(initialTask.priority || "medium");
       setDeliverableType(initialTask.deliverableType || "Promo");
-      setAssignedTo(initialTask.assignedTo || "Abbay");
+      setAssignedTo(initialTask.assignedTo || "Bereket");
       setDueDate(
         initialTask.dueDate ? new Date(initialTask.dueDate).toISOString().split("T")[0] : ""
       );
@@ -55,7 +55,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
       setStatus("todo");
       setPriority("medium");
       setDeliverableType("Promo");
-      setAssignedTo(defaultWorkspace === "abbay_tv" ? "Dani" : "Abbay");
+      setAssignedTo(defaultWorkspace === "abbay_tv" ? "Dani" : "Bereket");
       setDueDate(new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]);
       setEstimatedHours("4.0");
       setTags("");
@@ -175,14 +175,14 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                 onChange={(e) => setAssignedTo(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="Abbay">Abbay (Me - Lead)</option>
+                <option value="Bereket">Bereket (Me - Graphics Lead)</option>
                 <option value="Dani">Dani (3D / Motion)</option>
                 <option value="Sura">Sura (Promos / DaVinci)</option>
                 <option value="Simon">Simon (Broadcast / L-Shapes)</option>
                 <option value="Kiru">Kiru (Thumbnails / Graphics)</option>
-                <option value="Bereket">Bereket (Junior / Cutdowns)</option>
+
                 {teamMembers
-                  .filter((m) => !["Abbay", "Dani", "Sura", "Simon", "Kiru", "Bereket"].includes(m.name))
+                  .filter((m) => !["Dani", "Sura", "Simon", "Kiru", "Bereket"].includes(m.name))
                   .map((m) => (
                     <option key={m.name} value={m.name}>
                       {m.name} ({m.role})

@@ -1,8 +1,8 @@
 import { db } from "./db";
 
 export async function seedDatabaseIfEmpty() {
-  const taskCount = await db.task.count();
-  if (taskCount > 0) {
+  const memberCount = await db.teamMember.count();
+  if (memberCount > 0) {
     return { seeded: false, message: "Database already populated" };
   }
 
@@ -42,18 +42,10 @@ export async function seedDatabaseIfEmpty() {
     },
     {
       name: "Bereket",
-      role: "Junior Motion Designer & Assistant Editor",
-      skills: "Cutdowns, Social Resizing (9:16), Lower Third Placement, DaVinci Resolve",
-      currentCapacityHours: 28.0,
-      status: "available",
-      notes: "Very dependable with social cutdowns, formatting re-sizes, and asset organization.",
-    },
-    {
-      name: "Abbay",
       role: "Graphics Department Lead & Senior Motion Pro",
       skills: "Art Direction, DaVinci Resolve, Motion Graphics, Broadcast Packaging, Team Leadership",
-      currentCapacityHours: 20.0,
-      status: "busy",
+      currentCapacityHours: 40.0,
+      status: "available",
       notes: "Department Head overseeing all broadcast aesthetics, freelance clients, and personal projects.",
     },
   ];

@@ -4,23 +4,23 @@ import { seedDatabaseIfEmpty } from "@/lib/seed";
 
 export async function GET() {
   try {
-    const [tasks, projects, teamMembers, memories, activityLogs] = await Promise.all([
+    const [tasks, projects, teamMembers, achievements, activityLogs] = await Promise.all([
       db.task.findMany(),
       db.project.findMany(),
       db.teamMember.findMany(),
-      db.memory.findMany(),
+      db.achievement.findMany(),
       db.activityLog.findMany({ take: 200, orderBy: { createdAt: "desc" } }),
     ]);
 
     const backup = {
       version: "1.0",
       exportedAt: new Date().toISOString(),
-      user: "Abbay (Graphics Department Lead)",
+      user: "Bereket (Graphics Department Lead)",
       data: {
         tasks,
         projects,
         teamMembers,
-        memories,
+        achievements,
         activityLogs,
       },
     };

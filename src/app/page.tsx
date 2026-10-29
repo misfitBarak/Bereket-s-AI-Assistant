@@ -9,7 +9,7 @@ import { TasksView } from "@/components/tasks/TasksView";
 import { AbbayTvView } from "@/components/workspaces/AbbayTvView";
 import { ClientWorkView } from "@/components/workspaces/ClientWorkView";
 import { PersonalProjectsView } from "@/components/workspaces/PersonalProjectsView";
-import { MemoryView } from "@/components/memories/MemoryView";
+import { GrowthView } from "@/components/growth/GrowthView";
 import { SettingsView } from "@/components/settings/SettingsView";
 import { TaskModal } from "@/components/tasks/TaskModal";
 import { TaskItem, WorkspaceType } from "@/types";
@@ -163,7 +163,7 @@ export default function Home() {
             />
           )}
 
-          {activeTab === "memories" && <MemoryView key={refreshTrigger} />}
+          {activeTab === "growth" && <GrowthView key={refreshTrigger} />}
 
           {activeTab === "settings" && <SettingsView />}
         </main>

@@ -187,7 +187,18 @@ export const ClientWorkView: React.FC<ClientWorkViewProps> = ({
         <h2 className="text-base font-bold text-slate-900 dark:text-white">Active Client Projects</h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {projects.map((proj) => {
+          {projects.length === 0 ? (
+            <div className="col-span-full p-12 text-center bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
+              <Briefcase className="w-10 h-10 text-emerald-500 mx-auto mb-3 opacity-60" />
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                No active client projects
+              </h3>
+              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                Client pipeline is currently empty. All financial metrics are at 0 ETB. Click &quot;New Client Project&quot; to register a new client engagement.
+              </p>
+            </div>
+          ) : (
+            projects.map((proj) => {
             const projectTasks = tasks.filter((t) => t.projectId === proj.id);
             let parsedMilestones: any[] = [];
             if (proj.milestones) {
@@ -315,7 +326,8 @@ export const ClientWorkView: React.FC<ClientWorkViewProps> = ({
                 </div>
               </div>
             );
-          })}
+          })
+        )}
         </div>
       </div>
 

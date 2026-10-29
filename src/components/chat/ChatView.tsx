@@ -41,7 +41,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ onRefreshData, onOpenSetting
     "I need to finish a personal video project this month. Help me break it into tasks.",
     "What have I been neglecting lately?",
     "Summarize my completed work this week.",
-    "Remind me what I decided about my last project.",
+    "Show my recent accomplishments and growth progress.",
   ];
 
   const fetchMessages = async () => {
@@ -214,6 +214,19 @@ export const ChatView: React.FC<ChatViewProps> = ({ onRefreshData, onOpenSetting
 
       {/* Messages Scroll Area */}
       <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6 space-y-6">
+        {messages.length === 0 && !isLoading && (
+          <div className="max-w-md mx-auto my-12 p-8 text-center bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 shadow-2xs">
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 flex items-center justify-center mx-auto mb-3">
+              <Sparkles className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">
+              AI Assistant Ready
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+              Welcome, Bereket! Your command center is cleared and ready for fresh instructions. Ask me to plan tasks, coordinate team workload, or draft broadcast reports.
+            </p>
+          </div>
+        )}
         {messages.map((msg) => {
           const isUser = msg.role === "user";
           return (
@@ -359,7 +372,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ onRefreshData, onOpenSetting
           </button>
         </form>
         <p className="text-center text-[11px] text-slate-400 dark:text-slate-500 mt-2">
-          Abbay AI Assistant maintains structured memory across Abbay TV, freelance clients, and personal media. Consequential actions require approval.
+          Abbay AI Assistant tracks deliverables, growth, and team workload across Abbay TV, freelance clients, and personal media. Consequential actions require approval.
         </p>
       </div>
     </div>

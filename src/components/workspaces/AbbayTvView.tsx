@@ -111,7 +111,7 @@ export const AbbayTvView: React.FC<AbbayTvViewProps> = ({ onOpenTaskModal, onNav
 
       const md = `# Abbay TV — Graphics Department Weekly Management Report
 **Date:** ${weekDate}  
-**Lead:** Abbay (Graphics Department Lead)  
+**Lead:** Bereket (Graphics Department Lead)  
 **Broadcast Week Status:** Active & On Air  
 
 ---
@@ -127,7 +127,7 @@ ${completed.length === 0 ? "*No deliverables marked completed this cycle yet.*" 
 ---
 
 ### 3. Active & In-Progress Production Queue (${inProgress.length})
-${inProgress.map((t) => `- **${t.title}** (${t.deliverableType || "Deliverable"})  
+${inProgress.length === 0 ? "*No active production deliverables queued.*" : inProgress.map((t) => `- **${t.title}** (${t.deliverableType || "Deliverable"})  
   Assigned: \`${t.assignedTo || "Unassigned"}\` | Priority: \`${t.priority.toUpperCase()}\` | Due: \`${formatDate(t.dueDate)}\``).join("\n")}
 
 ---
@@ -236,7 +236,7 @@ ${team.map((m) => `- **${m.name}** (${m.role}): Assigned ${m.totalAssignedHours 
         <button
           onClick={() => {
             setActiveTab("report");
-            if (!reportMarkdown) handleGenerateReport();
+            handleGenerateReport();
           }}
           className={`px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 ${
             activeTab === "report"
@@ -312,6 +312,11 @@ ${team.map((m) => `- **${m.name}** (${m.role}): Assigned ${m.totalAssignedHours 
                   </div>
 
                   <div className="flex-1 space-y-3 overflow-y-auto">
+                    {colTasks.length === 0 && (
+                      <div className="text-center py-8 text-slate-400 text-xs italic">
+                        No deliverables
+                      </div>
+                    )}
                     {colTasks.map((t) => (
                       <div
                         key={t.id}

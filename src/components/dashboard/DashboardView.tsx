@@ -155,7 +155,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             {todayCount} <span className="text-xs font-normal text-slate-500">priority tasks</span>
           </div>
           <div className="mt-2 text-xs text-blue-600 dark:text-blue-400 font-medium">
-            Abbay TV & Freelance queue
+            {todayCount === 0 ? "Ready for new deliverables" : "Abbay TV & Freelance queue"}
           </div>
         </div>
 

@@ -37,6 +37,46 @@ export interface ToolDefinition {
 
 export const AI_TOOLS: ToolDefinition[] = [
   {
+    name: "get_growth_and_accomplishments",
+    description: "Retrieve recent accomplishments, deliverable breakthroughs, milestones, and what changed across workspaces.",
+    parameters: {
+      type: "object",
+      properties: {
+        category: {
+          type: "string",
+          enum: ["all", "abbay_tv", "client_work", "personal_projects", "career"],
+          description: "Optional category filter",
+        },
+      },
+    },
+  },
+  {
+    name: "record_accomplishment",
+    description: "Record a major accomplishment, milestone breakthrough, or progress update.",
+    parameters: {
+      type: "object",
+      properties: {
+        title: { type: "string", description: "Title of the accomplishment" },
+        description: { type: "string", description: "Context or reflection" },
+        category: {
+          type: "string",
+          enum: ["abbay_tv", "client_work", "personal_projects", "career"],
+          description: "Sector/category",
+        },
+        type: {
+          type: "string",
+          enum: ["milestone", "deliverable", "revenue", "breakthrough"],
+        },
+        metric: { type: "string", description: "Outcome or numeric metric" },
+        impact: {
+          type: "string",
+          enum: ["medium", "high", "major", "breakthrough"],
+        },
+      },
+      required: ["title"],
+    },
+  },
+  {
     name: "get_today_focus",
     description: "Get today's high-priority and urgent tasks across Abbay TV, client projects, and personal work.",
     parameters: {
@@ -65,7 +105,7 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "get_department_workload",
-    description: "Inspect the Graphics Department team (Dani, Sura, Simon, Kiru, Bereket, Abbay), active tasks, and identify who is overloaded or has free capacity.",
+    description: "Inspect the Graphics Department team (Dani, Sura, Simon, Kiru, Bereket), active tasks, and identify who is overloaded or has free capacity.",
     parameters: {
       type: "object",
       properties: {
@@ -102,7 +142,7 @@ export const AI_TOOLS: ToolDefinition[] = [
           enum: ["abbay_tv", "client_work", "personal_projects"],
           description: "Target workspace",
         },
-        assignedTo: { type: "string", description: "Team member name (Dani, Sura, Simon, Kiru, Bereket, or Abbay)" },
+        assignedTo: { type: "string", description: "Team member name (Dani, Sura, Simon, Kiru, or Bereket)" },
         dueDate: { type: "string", description: "Due date in YYYY-MM-DD format" },
         priority: {
           type: "string",
@@ -607,6 +647,44 @@ export async function executeTool(name: string, args: any): Promise<{ result: an
       };
     }
 
+    case "get_growth_and_accomplishments": {
+      const achievements = await db.achievement.findMany({
+        orderBy: [{ achievedAt: "desc" }],
+        take: 10,
+      });
+      const completedTasks = await db.task.findMany({
+        where: { status: "completed" },
+        take: 10,
+      });
+      return {
+        result: {
+          accomplishmentsCount: achievements.length + completedTasks.length,
+          achievements,
+          completedTasks: completedTasks.map((t) => ({ title: t.title, workspace: t.workspace, assignedTo: t.assignedTo })),
+        },
+      };
+    }
+
+    case "record_accomplishment": {
+      const achievement = await db.achievement.create({
+        data: {
+          title: args.title,
+          description: args.description || null,
+          category: args.category || "abbay_tv",
+          type: args.type || "milestone",
+          metric: args.metric || null,
+          impact: args.impact || "high",
+        },
+      });
+      return {
+        result: {
+          success: true,
+          message: `Recorded accomplishment: "${achievement.title}" in ${achievement.category}`,
+          achievementId: achievement.id,
+        },
+      };
+    }
+
     case "search_memories": {
       const memories = await db.memory.findMany({
         where: {
@@ -733,7 +811,7 @@ export async function executeTool(name: string, args: any): Promise<{ result: an
 
       const report = {
         department: "Abbay TV Graphics Department",
-        lead: "Abbay (Graphics Department Lead)",
+        lead: "Bereket (Graphics Department Lead)",
         period: `Current Broadcast Week (${now.toLocaleDateString("en-US", { month: "short", year: "numeric" })})`,
         highlights,
         completedDeliverables:

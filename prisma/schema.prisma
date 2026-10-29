@@ -93,6 +93,21 @@ model Memory {
   @@index([category])
 }
 
+model Achievement {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  category    String   // 'abbay_tv' | 'client_work' | 'personal_projects' | 'career'
+  type        String   @default("milestone") // 'milestone' | 'deliverable' | 'revenue' | 'breakthrough'
+  metric      String?  // e.g. '100% On-Air', '85,000 ETB', '35% Completed'
+  impact      String   @default("medium") // 'medium' | 'high' | 'major' | 'breakthrough'
+  achievedAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category, achievedAt])
+}
+
 model ChatMessage {
   id                  String   @id @default(cuid())
   conversationId      String   @default("default")
