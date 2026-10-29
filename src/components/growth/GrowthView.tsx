@@ -13,7 +13,6 @@ import {
   Tv,
   Briefcase,
   Target,
-  DollarSign,
   Clock,
   Trash2,
   RefreshCw,
@@ -28,7 +27,7 @@ interface AccomplishmentItem {
   id: string;
   title: string;
   description?: string | null;
-  category: "abbay_tv" | "client_work" | "personal_projects" | "career";
+  category: "abbay_tv" | "personal_projects" | "career";
   type: "milestone" | "deliverable" | "revenue" | "breakthrough";
   metric?: string | null;
   impact: "medium" | "high" | "major" | "breakthrough";
@@ -55,7 +54,7 @@ export const GrowthView: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
-  const [newCategory, setNewCategory] = useState<"abbay_tv" | "client_work" | "personal_projects" | "career">("abbay_tv");
+  const [newCategory, setNewCategory] = useState<"abbay_tv" | "personal_projects" | "career">("abbay_tv");
   const [newType, setNewType] = useState<"milestone" | "deliverable" | "revenue" | "breakthrough">("milestone");
   const [newMetric, setNewMetric] = useState("");
   const [newImpact, setNewImpact] = useState<"medium" | "high" | "major" | "breakthrough">("high");
@@ -145,7 +144,6 @@ export const GrowthView: React.FC = () => {
   const categories = [
     { id: "all", label: "All Sectors" },
     { id: "abbay_tv", label: "Abbay TV Graphics" },
-    { id: "client_work", label: "Client Engagements" },
     { id: "personal_projects", label: "Personal Ambitions" },
     { id: "career", label: "Career Milestones" },
   ];
@@ -254,15 +252,16 @@ export const GrowthView: React.FC = () => {
 
         <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
           <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider">Client Value Realized</span>
+            <span className="text-xs font-semibold uppercase tracking-wider">Logged Milestones</span>
             <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600">
-              <DollarSign className="w-4 h-4" />
+              <Award className="w-4 h-4" />
             </div>
           </div>
           <div className="text-2xl font-bold text-slate-900 dark:text-white">
-            {formatCurrency(metrics.totalClientRevenue, "ETB")}
+            {accomplishments.length}{" "}
+            <span className="text-xs font-normal text-slate-500">recorded</span>
           </div>
-          <span className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 block">Invoiced & collected</span>
+          <span className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 block">Team & career achievements</span>
         </div>
       </div>
 
@@ -313,7 +312,7 @@ export const GrowthView: React.FC = () => {
               No accomplishments or progress recorded yet
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              As you deliver Abbay TV broadcasts, complete freelance client milestones, and advance your personal masterclass projects, your achievements and growth timeline will automatically compile here.
+              As you deliver Abbay TV broadcasts, coordinate team deliverables, and advance your personal masterclass projects, your achievements and growth timeline will automatically compile here.
             </p>
           </div>
           <button
@@ -337,8 +336,6 @@ export const GrowthView: React.FC = () => {
                     className={`text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded ${
                       item.category === "abbay_tv"
                         ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
-                        : item.category === "client_work"
-                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
                         : item.category === "personal_projects"
                         ? "bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300"
                         : "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300"
@@ -468,7 +465,6 @@ export const GrowthView: React.FC = () => {
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white"
                   >
                     <option value="abbay_tv">Abbay TV Graphics</option>
-                    <option value="client_work">Client Engagements</option>
                     <option value="personal_projects">Personal Ambitions</option>
                     <option value="career">Career Milestone</option>
                   </select>

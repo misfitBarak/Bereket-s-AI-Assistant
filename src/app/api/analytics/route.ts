@@ -13,11 +13,9 @@ export async function GET() {
       db.project.findMany(),
     ]);
 
-    // Client financials summary (calculated strictly from client_work projects)
-    const clientProjects = allProjects.filter((p) => p.workspace === "client_work");
-    const totalQuoted = clientProjects.reduce((sum, p) => sum + (p.quotedAmount || 0), 0);
-    const totalPaid = clientProjects.reduce((sum, p) => sum + (p.paidAmount || 0), 0);
-    const pendingBalance = totalQuoted - totalPaid;
+    const totalQuoted = 0;
+    const totalPaid = 0;
+    const pendingBalance = 0;
 
     return NextResponse.json({
       success: true,
@@ -32,7 +30,7 @@ export async function GET() {
         todayTasks: metrics.todayTasks,
         upcomingDeadlines: metrics.upcomingDeadlines,
         workspaceStats: metrics.byWorkspace,
-        clientProjectsCount: clientProjects.length,
+        clientProjectsCount: 0,
         financials: {
           totalQuoted,
           totalPaid,

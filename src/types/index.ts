@@ -72,7 +72,7 @@ export interface AchievementItem {
   id: string;
   title: string;
   description?: string | null;
-  category: "abbay_tv" | "client_work" | "personal_projects" | "career";
+  category: "abbay_tv" | "personal_projects" | "career";
   type: "milestone" | "deliverable" | "revenue" | "breakthrough";
   metric?: string | null;
   impact: "medium" | "high" | "major" | "breakthrough";

@@ -37,7 +37,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ onRefreshData, onOpenSetting
     "Add a task for Dani to finish the MMA media pack by Thursday.",
     "What is everyone in the Graphics Department working on?",
     "I have three urgent adverts and two people available. Help me distribute the workload.",
-    "Plan my week around my Abbay TV responsibilities and freelance work.",
+    "Plan my week around Abbay TV broadcast priorities and team coordination.",
     "I need to finish a personal video project this month. Help me break it into tasks.",
     "What have I been neglecting lately?",
     "Summarize my completed work this week.",
@@ -372,7 +372,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ onRefreshData, onOpenSetting
           </button>
         </form>
         <p className="text-center text-[11px] text-slate-400 dark:text-slate-500 mt-2">
-          Abbay AI Assistant tracks deliverables, growth, and team workload across Abbay TV, freelance clients, and personal media. Consequential actions require approval.
+          Abbay AI Assistant tracks broadcast deliverables, growth, and team workload across Abbay TV and personal media. Consequential actions require approval.
         </p>
       </div>
     </div>

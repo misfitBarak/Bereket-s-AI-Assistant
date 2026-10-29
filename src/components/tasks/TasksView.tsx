@@ -94,7 +94,7 @@ export const TasksView: React.FC<TasksViewProps> = ({ onOpenTaskModal }) => {
             Task & Deliverables Master Registry
           </h1>
           <p className="text-xs text-slate-500">
-            View, filter, edit, and organize all tasks across Abbay TV Graphics, Client Projects, and Personal Goals.
+            View, filter, edit, and organize all tasks across Abbay TV Graphics and Personal Goals.
           </p>
         </div>
 
@@ -137,7 +137,6 @@ export const TasksView: React.FC<TasksViewProps> = ({ onOpenTaskModal }) => {
             >
               <option value="all">All Workspaces</option>
               <option value="abbay_tv">Abbay TV Graphics</option>
-              <option value="client_work">Client Work</option>
               <option value="personal_projects">Personal Projects</option>
             </select>
           </div>
@@ -227,8 +226,6 @@ export const TasksView: React.FC<TasksViewProps> = ({ onOpenTaskModal }) => {
                         className={`text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded ${
                           task.workspace === "abbay_tv"
                             ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
-                            : task.workspace === "client_work"
-                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
                             : "bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300"
                         }`}
                       >

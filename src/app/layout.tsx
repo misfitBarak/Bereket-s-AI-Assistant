@@ -7,7 +7,7 @@ export const revalidate = 0;
 export const metadata: Metadata = {
   title: "Abbay AI Command Center — Personal Workspace & TV Operations",
   description:
-    "AI-powered personal command center for Abbay TV Graphics Department, freelance client deliverables, and personal media projects.",
+    "AI-powered personal command center for Abbay TV Graphics Department, broadcast deliverables, and personal media projects.",
   manifest: "/manifest.json",
   icons: {
     icon: "/icon.png",

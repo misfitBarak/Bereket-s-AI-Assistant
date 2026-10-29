@@ -7,7 +7,6 @@ import { ChatView } from "@/components/chat/ChatView";
 import { DashboardView } from "@/components/dashboard/DashboardView";
 import { TasksView } from "@/components/tasks/TasksView";
 import { AbbayTvView } from "@/components/workspaces/AbbayTvView";
-import { ClientWorkView } from "@/components/workspaces/ClientWorkView";
 import { PersonalProjectsView } from "@/components/workspaces/PersonalProjectsView";
 import { GrowthView } from "@/components/growth/GrowthView";
 import { SettingsView } from "@/components/settings/SettingsView";
@@ -69,7 +68,6 @@ export default function Home() {
   const handleOpenTaskModal = (task?: Partial<TaskItem>, workspace?: WorkspaceType) => {
     setTaskModalInitial(task || null);
     if (workspace) setTaskModalDefaultWorkspace(workspace);
-    else if (activeTab === "client_work") setTaskModalDefaultWorkspace("client_work");
     else if (activeTab === "personal_projects") setTaskModalDefaultWorkspace("personal_projects");
     else setTaskModalDefaultWorkspace("abbay_tv");
     setIsTaskModalOpen(true);
@@ -141,14 +139,6 @@ export default function Home() {
 
           {activeTab === "abbay_tv" && (
             <AbbayTvView
-              key={refreshTrigger}
-              onOpenTaskModal={handleOpenTaskModal}
-              onNavigateTab={setActiveTab}
-            />
-          )}
-
-          {activeTab === "client_work" && (
-            <ClientWorkView
               key={refreshTrigger}
               onOpenTaskModal={handleOpenTaskModal}
               onNavigateTab={setActiveTab}

@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   CheckSquare,
   Tv,
-  Briefcase,
   TrendingUp,
   Award,
   Settings,
@@ -66,13 +65,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: Tv,
       color: "text-blue-600",
       pill: "TV",
-    },
-    {
-      id: "client_work",
-      label: "Client Work",
-      icon: Briefcase,
-      color: "text-emerald-500",
-      pill: "Clients",
     },
     {
       id: "personal_projects",

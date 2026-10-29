@@ -9,7 +9,6 @@ import {
   Bell,
   Cpu,
   Tv,
-  Briefcase,
   TrendingUp,
   Award,
 } from "lucide-react";
@@ -51,11 +50,6 @@ export const Header: React.FC<HeaderProps> = ({
       title: "Abbay TV Graphics Department",
       subtitle: "Team workload, promos, lower thirds & broadcast reports",
       icon: Tv,
-    },
-    client_work: {
-      title: "Client Work & Freelance",
-      subtitle: "Deliverables, revisions, and confidential billing",
-      icon: Briefcase,
     },
     personal_projects: {
       title: "Personal Projects & Ambitions",

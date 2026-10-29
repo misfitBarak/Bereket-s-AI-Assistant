@@ -37,9 +37,7 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
-    // Financial milestone
-    const clientProjects = allProjects.filter((p) => p.workspace === "client_work");
-    const totalClientRevenue = clientProjects.reduce((sum, p) => sum + (p.paidAmount || 0), 0);
+    const totalClientRevenue = 0;
 
     // Derived deliverable achievements from completed tasks
     const derivedTaskAccomplishments = completedTasks.map((t) => ({

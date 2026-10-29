@@ -44,7 +44,7 @@ export const AI_TOOLS: ToolDefinition[] = [
       properties: {
         category: {
           type: "string",
-          enum: ["all", "abbay_tv", "client_work", "personal_projects", "career"],
+          enum: ["all", "abbay_tv", "personal_projects", "career"],
           description: "Optional category filter",
         },
       },
@@ -60,7 +60,7 @@ export const AI_TOOLS: ToolDefinition[] = [
         description: { type: "string", description: "Context or reflection" },
         category: {
           type: "string",
-          enum: ["abbay_tv", "client_work", "personal_projects", "career"],
+          enum: ["abbay_tv", "personal_projects", "career"],
           description: "Sector/category",
         },
         type: {
@@ -78,13 +78,13 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "get_today_focus",
-    description: "Get today's high-priority and urgent tasks across Abbay TV, client projects, and personal work.",
+    description: "Get today's high-priority and urgent tasks across Abbay TV and personal work.",
     parameters: {
       type: "object",
       properties: {
         workspace: {
           type: "string",
-          enum: ["all", "abbay_tv", "client_work", "personal_projects"],
+          enum: ["all", "abbay_tv", "personal_projects"],
           description: "Optional workspace filter.",
         },
       },
@@ -98,7 +98,7 @@ export const AI_TOOLS: ToolDefinition[] = [
       properties: {
         workspace: {
           type: "string",
-          enum: ["all", "abbay_tv", "client_work", "personal_projects"],
+          enum: ["all", "abbay_tv", "personal_projects"],
         },
       },
     },
@@ -132,14 +132,14 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "create_task",
-    description: "Create a new task in the database for Abbay TV, client work, or personal projects.",
+    description: "Create a new task in the database for Abbay TV or personal projects.",
     parameters: {
       type: "object",
       properties: {
         title: { type: "string", description: "Title of the task" },
         workspace: {
           type: "string",
-          enum: ["abbay_tv", "client_work", "personal_projects"],
+          enum: ["abbay_tv", "personal_projects"],
           description: "Target workspace",
         },
         assignedTo: { type: "string", description: "Team member name (Dani, Sura, Simon, Kiru, or Bereket)" },
@@ -239,7 +239,7 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "generate_daily_plan",
-    description: "Generate a realistic daily plan balancing Abbay TV responsibilities, freelance client milestones, and personal projects without burnout.",
+    description: "Generate a realistic daily plan balancing Abbay TV responsibilities and personal projects without burnout.",
     parameters: {
       type: "object",
       properties: {
@@ -265,13 +265,13 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "detect_neglected_projects",
-    description: "Identify any personal or client projects that have had no recent task activity or progress.",
+    description: "Identify any projects that have had no recent task activity or progress.",
     parameters: {
       type: "object",
       properties: {
         workspace: {
           type: "string",
-          description: "Optional workspace filter (e.g. all, client_work, personal_projects)",
+          description: "Optional workspace filter (e.g. all, abbay_tv, personal_projects)",
         },
       },
     },
@@ -755,22 +755,19 @@ export async function executeTool(name: string, args: any): Promise<{ result: an
           ? tvTasks.map((t) => `${t.title} (${t.assignedTo || "Unassigned"}, ${t.priority})`).join("; ")
           : "Routine broadcast queue monitoring & team support";
 
-      const clientSummary =
-        clientTasks.length > 0
-          ? clientTasks.map((t) => `${t.title} (${t.priority})`).join("; ")
-          : "No immediate client deadlines pending; buffer for outreach or pipeline review";
+      const middaySummary = "Review pending team promos, verify on-air broadcast standards, and sign off on graphics packages";
 
       const personalSummary =
         personalTasks.length > 0
           ? personalTasks.map((t) => `${t.title} (${t.priority})`).join("; ")
           : "Personal skill development & tutorial recording";
 
-      const allActive = [...tvTasks, ...clientTasks, ...personalTasks];
+      const allActive = [...tvTasks, ...personalTasks];
 
       const plan = {
         date: now.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "short", day: "numeric" }),
         morningBlock: `09:00 - 12:30: Abbay TV High-Impact Review & Team Coordination (Focus: ${tvSummary}).`,
-        middayBlock: `13:30 - 15:30: Client Deliverables & Revisions (Focus: ${clientSummary}).`,
+        middayBlock: `13:30 - 15:30: Team Production & Deliverable Approvals (${middaySummary}).`,
         afternoonBlock: `16:00 - 17:30: Broadcast Production Wrap & Station Quality Check (Finalizing daily transmissions).`,
         eveningBlock: `18:00 - 19:30: Personal Creative Projects & Long-Term Assets (Focus: ${personalSummary}).`,
         priorities: allActive.map((t) => `• [${t.workspace.toUpperCase()}] ${t.title} (${t.assignedTo || "You"})`),

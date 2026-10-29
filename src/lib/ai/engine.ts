@@ -61,7 +61,7 @@ export async function processUserMessage(
   });
 
   const systemPrompt = `You are the Personal AI Command Center assistant for Bereket (Barakat), Graphics Department Lead at Abbay TV (an Ethiopian television station) with 6+ years experience in video editing, motion graphics, DaVinci Resolve, and TV broadcast packaging.
-Bereket also manages freelance client video projects and personal content/educational ventures.
+Bereket also oversees personal media projects and educational ventures.
 
 Current System Date & Time Anchor: ${dateFormatted} (Year: ${now.getFullYear()})
 CRITICAL TIME ANCHOR: Today is Wednesday, October 14, 2026. All relative deadlines ("tomorrow", "this Thursday", "by Friday", "next week") MUST be anchored to October 2026 or later. NEVER invent, suggest, or output dates in past years (such as 2024 or 2025).
@@ -78,12 +78,11 @@ ${recentAchievements.length === 0 ? "No accomplishments recorded yet (system cle
 CRITICAL OPERATIONAL RULES:
 1. TRUTHFULNESS & GROUNDING: Ground every single answer in live database records. Always invoke the provided tools to query tasks, workload, projects, and memories before making statements. NEVER fabricate percentages (such as "65% done" unless returned by a project record), deadlines, hours, or artist capacity.
 2. DUPLICATE AWARENESS: When creating a task via \`create_task\`, examine the tool result. If a duplicate warning is returned, explicitly inform the user so they are aware an active task with identical intent already exists.
-3. Keep the 3 workspaces strictly separated:
+3. Keep workspaces strictly organized:
    - Abbay TV: Broadcast graphics, promos, lower thirds, L-shapes, media packs, and team coordination.
-   - Client Work: Freelance clients, deliverables, revision rounds, and confidential billing.
    - Personal Projects: DaVinci Masterclass, presets, AI cutdown automation, long-term goals.
 4. CONSEQUENTIAL ACTION SAFEGUARD: When the user requests deleting a task, deleting a project, or making destructive changes, you MUST call \`request_task_deletion\`. Never claim an item was deleted until confirmed by user.
-5. When planning schedules, differentiate urgent broadcast promos from freelance and personal goals without overloading available hours. Provide concise, professional, articulate, and actionable responses.
+5. When planning schedules, differentiate urgent broadcast promos from personal goals without overloading available hours. Provide concise, professional, articulate, and actionable responses.
 6. PERSONAL TELEGRAM ACCOUNT & IDENTITY SEPARATION:
    - There are TWO distinct messaging identities:
      a) Personal Telegram Account: sends directly as Bereket's personal identity (via GramJS MTProto).
@@ -809,13 +808,11 @@ async function runAutonomousLocalEngine(
     if (tasks.length === 0) {
       content += `You have no urgent tasks scheduled for today. You can focus on proactive projects or personal tutorials!`;
     } else {
-      content += `Here are your high-priority items across Abbay TV, freelance, and personal ventures:\n\n`;
+      content += `Here are your high-priority items across Abbay TV and personal ventures:\n\n`;
       tasks.forEach((t: any, i: number) => {
         const badge =
           t.workspace === "abbay_tv"
             ? "🟦 **Abbay TV**"
-            : t.workspace === "client_work"
-            ? "🟩 **Client Work**"
             : "🟪 **Personal**";
         content += `${i + 1}. ${badge}: **${t.title}**\n   - Assigned: \`${t.assignedTo}\` | Priority: \`${t.priority.toUpperCase()}\` | Due: \`${t.dueDate}\`\n`;
       });
@@ -837,7 +834,7 @@ async function runAutonomousLocalEngine(
 
     let content = `### ⚠️ Overdue Task Inspection\n\n`;
     if (overdueCount === 0) {
-      content += `✅ **Outstanding news!** There are currently **no overdue tasks** across any of your workspaces.\nAll Abbay TV broadcast packages and client deliverables are on track.`;
+      content += `✅ **Outstanding news!** There are currently **no overdue tasks** across any of your workspaces.\nAll Abbay TV broadcast packages and team deliverables are on track.`;
     } else {
       content += `Found **${overdueCount} overdue item(s)** that require immediate attention:\n\n`;
       tasks.forEach((t: any) => {
@@ -870,8 +867,7 @@ async function runAutonomousLocalEngine(
     else if (lower.includes("bereket")) assignedTo = "Bereket";
 
     let workspace: any = "abbay_tv";
-    if (lower.includes("client") || lower.includes("freelance") || lower.includes("ethio")) workspace = "client_work";
-    else if (lower.includes("personal") || lower.includes("youtube") || lower.includes("masterclass")) workspace = "personal_projects";
+    if (lower.includes("personal") || lower.includes("youtube") || lower.includes("masterclass")) workspace = "personal_projects";
 
     let title = userMessage
       .replace(/^add (a )?task (for \w+ )?(to )?/i, "")
@@ -1300,7 +1296,7 @@ async function runAutonomousLocalEngine(
     content: `Hello Bereket. I am your Personal AI Command Center, operating in **Autonomous Engine (Demo Mode)**.
 
 Currently active across your workspaces:
-- **${focusRes.count} active priority items** across Abbay TV, freelance, and personal ventures.
+- **${focusRes.count} active priority items** across Abbay TV and personal ventures.
 - Full access to the Graphics Department roster (Dani, Sura, Simon, Kiru, Bereket).
 
 You can instruct me to:

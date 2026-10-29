@@ -309,7 +309,7 @@ export async function handleTelegramUpdate(
   if (lower === "/start") {
     const text =
       `👋 *Welcome Bereket!*\n\n` +
-      `I am your *Personal AI Command Center* on Telegram, connected directly to your Abbay TV Graphics Department, freelance clients, and personal projects.\n\n` +
+      `I am your *Personal AI Command Center* on Telegram, connected directly to your Abbay TV Graphics Department and personal projects.\n\n` +
       `*Available Commands:*\n` +
       `• /tasks — View active priority tasks & deliverables\n` +
       `• /briefing — Daily executive briefing & workload summary\n` +
@@ -375,10 +375,9 @@ export async function handleTelegramUpdate(
     const parts = lower.split(/\s+/);
     let filterWorkspace = parts[1];
     if (filterWorkspace === "abbay" || filterWorkspace === "abbaytv") filterWorkspace = "abbay_tv";
-    if (filterWorkspace === "client") filterWorkspace = "client_work";
     if (filterWorkspace === "personal") filterWorkspace = "personal_projects";
 
-    const validWorkspace = ["abbay_tv", "client_work", "personal_projects"].includes(filterWorkspace)
+    const validWorkspace = ["abbay_tv", "personal_projects"].includes(filterWorkspace)
       ? filterWorkspace
       : undefined;
 
@@ -405,12 +404,12 @@ export async function handleTelegramUpdate(
       const p = priorityEmoji[t.priority] || "🟡";
       const due = t.dueDate ? ` | Due: ${t.dueDate.toISOString().split("T")[0]}` : "";
       const assigned = t.assignedTo ? ` | 👤 ${t.assignedTo}` : "";
-      const ws = t.workspace === "abbay_tv" ? "📺 Abbay TV" : t.workspace === "client_work" ? "💼 Client" : "🚀 Personal";
+      const ws = t.workspace === "abbay_tv" ? "📺 Abbay TV" : "🚀 Personal";
       text += `${p} *${t.title}*\n   _${ws}${assigned}${due}_\n\n`;
     }
 
     if (hasMore) {
-      text += `_Showing top ${tasks.length} of ${total} active tasks. Use filters like /tasks abbay or /tasks client to narrow down._\n\n`;
+      text += `_Showing top ${tasks.length} of ${total} active tasks. Use filters like /tasks abbay or /tasks personal to narrow down._\n\n`;
     }
 
     text += `_To create or modify tasks, simply type your request naturally!_`;

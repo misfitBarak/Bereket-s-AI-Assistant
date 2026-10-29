@@ -6,7 +6,6 @@ import {
   AlertTriangle,
   CheckCircle2,
   Users,
-  Briefcase,
   Sparkles,
   TrendingUp,
   Plus,
@@ -97,7 +96,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
           <h1 className="text-2xl font-bold tracking-tight">Personal Command Center</h1>
           <p className="text-sm text-blue-100 mt-1 max-w-xl">
-            Welcome, Bereket. Lead your 4 broadcast artists (Dani, Sura, Simon, Kiru) and department deliverables at Abbay TV, track freelance client milestones, and advance your personal projects.
+            Welcome, Bereket. Lead your 4 broadcast artists (Dani, Sura, Simon, Kiru) and department deliverables at Abbay TV, coordinate on-air graphics, and manage team workload.
           </p>
         </div>
 
@@ -129,7 +128,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 {overdueCount} task{overdueCount > 1 ? "s are" : " is"} overdue
               </p>
               <p className="text-xs text-red-700 dark:text-red-400">
-                Action required to avoid broadcast promo or client delivery delays.
+                Action required to avoid broadcast promo or on-air delivery delays.
               </p>
             </div>
           </div>
@@ -155,7 +154,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             {todayCount} <span className="text-xs font-normal text-slate-500">priority tasks</span>
           </div>
           <div className="mt-2 text-xs text-blue-600 dark:text-blue-400 font-medium">
-            {todayCount === 0 ? "Ready for new deliverables" : "Abbay TV & Freelance queue"}
+            {todayCount === 0 ? "Ready for new deliverables" : "Abbay TV Graphics queue"}
           </div>
         </div>
 
@@ -177,17 +176,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
         <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
           <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider">Client Pipeline</span>
+            <span className="text-xs font-semibold uppercase tracking-wider">Broadcast Queue</span>
             <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600">
-              <Briefcase className="w-4 h-4" />
+              <Tv className="w-4 h-4" />
             </div>
           </div>
           <div className="text-2xl font-bold text-slate-900 dark:text-white">
-            {formatCurrency(financials.totalQuoted, financials.currency)}
+            {workspaceStats.abbay_tv?.active || 0} <span className="text-xs font-normal text-slate-500">active items</span>
           </div>
           <div className="mt-2 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-            Paid: {formatCurrency(financials.totalPaid, financials.currency)} • Pending:{" "}
-            {formatCurrency(financials.pendingBalance, financials.currency)}
+            {workspaceStats.abbay_tv?.completed || 0} completed on-air items
           </div>
         </div>
 
@@ -385,8 +383,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded ${
                       t.workspace === "abbay_tv"
                         ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
-                        : t.workspace === "client_work"
-                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
                         : "bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300"
                     }`}
                   >

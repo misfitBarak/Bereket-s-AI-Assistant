@@ -105,7 +105,6 @@ export const TaskModal: React.FC<TaskModalProps> = ({
     "Poster",
     "Media Pack",
     "Broadcast Graphic",
-    "Freelance Video",
     "Reel / Short",
     "YouTube Video",
   ];
@@ -161,7 +160,6 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                 className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="abbay_tv">Abbay TV Graphics</option>
-                <option value="client_work">Client Work</option>
                 <option value="personal_projects">Personal Projects</option>
               </select>
             </div>
