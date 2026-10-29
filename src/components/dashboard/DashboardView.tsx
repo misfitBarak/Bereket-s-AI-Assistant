@@ -97,7 +97,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
           <h1 className="text-2xl font-bold tracking-tight">Personal Command Center</h1>
           <p className="text-sm text-blue-100 mt-1 max-w-xl">
-            Welcome, Abbay. Coordinate your 5 broadcast artists (Dani, Sura, Simon, Kiru, Bereket), track freelance client milestones, and advance your personal media masterclass.
+            Welcome, Bereket. Lead your 4 broadcast artists (Dani, Sura, Simon, Kiru) and department deliverables at Abbay TV, track freelance client milestones, and advance your personal projects.
           </p>
         </div>
 

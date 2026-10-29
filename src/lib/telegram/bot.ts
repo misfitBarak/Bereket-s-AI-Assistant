@@ -308,7 +308,7 @@ export async function handleTelegramUpdate(
   // 6. Built-in Command: /start
   if (lower === "/start") {
     const text =
-      `👋 *Welcome Abbay!*\n\n` +
+      `👋 *Welcome Bereket!*\n\n` +
       `I am your *Personal AI Command Center* on Telegram, connected directly to your Abbay TV Graphics Department, freelance clients, and personal projects.\n\n` +
       `*Available Commands:*\n` +
       `• /tasks — View active priority tasks & deliverables\n` +

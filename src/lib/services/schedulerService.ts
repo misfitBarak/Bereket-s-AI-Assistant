@@ -215,12 +215,12 @@ export async function resolveRecipient(recipientName: string): Promise<{
   const norm = recipientName.trim().toLowerCase();
   const cleanNorm = norm.replace(/^(the|my)\s+/i, "");
 
-  // 1. Self / Abbay
-  if (norm === "me" || norm === "myself" || norm === "self" || norm === "abbay" || norm === "admin") {
+  // 1. Self / Bereket
+  if (norm === "me" || norm === "myself" || norm === "self" || norm === "bereket" || norm === "barakat" || norm === "abbay" || norm === "admin") {
     const setting = await db.appSetting.findUnique({ where: { key: "TELEGRAM_ALLOWED_USER_ID" } });
     const chatId = setting?.value || process.env.TELEGRAM_ALLOWED_USER_ID || "375975361";
     return {
-      name: "Abbay (Self)",
+      name: "Bereket (Self)",
       chatId,
       type: "self",
       isConfigured: true,

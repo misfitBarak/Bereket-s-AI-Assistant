@@ -94,7 +94,7 @@ export const PersonalProjectsView: React.FC<PersonalProjectsViewProps> = ({
             DaVinci Resolve & Motion Masterclass
           </h3>
           <p className="text-xs text-slate-500 leading-relaxed">
-            Position Abbay as the premier Ethiopian broadcast motion designer. Publish structured video courses & tutorials.
+            Position Bereket as the premier Ethiopian broadcast motion designer. Publish structured video courses & tutorials.
           </p>
         </div>
 

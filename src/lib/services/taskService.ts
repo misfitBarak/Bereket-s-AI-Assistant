@@ -278,7 +278,7 @@ export async function getDepartmentWorkload(anchorDate: Date = new Date()): Prom
 
   return {
     department: "Abbay TV Graphics Department",
-    lead: "Abbay",
+    lead: "Bereket",
     totalActiveTasks: activeTvTasks.length,
     totalAssignedHours: Math.round(totalAssignedHours * 10) / 10,
     team: teamReport,

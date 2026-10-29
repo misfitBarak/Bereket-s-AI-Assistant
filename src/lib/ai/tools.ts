@@ -278,11 +278,11 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "schedule_telegram_message",
-    description: "Schedule a future message, reminder, or live report. You can specify whether to send from the assistant bot (@BereketAssistantBot) or from Abbay's personal Telegram account ('personal'). Operates in Africa/Addis_Ababa timezone (e.g. 'Tomorrow at 5 PM', 'Every weekday at 8 AM').",
+    description: "Schedule a future message, reminder, or live report. You can specify whether to send from the assistant bot (@BereketAssistantBot) or from Bereket's personal Telegram account ('personal'). Operates in Africa/Addis_Ababa timezone (e.g. 'Tomorrow at 5 PM', 'Every weekday at 8 AM').",
     parameters: {
       type: "object",
       properties: {
-        recipient: { type: "string", description: "Recipient name, e.g. 'Dani', 'Sura', 'Simon', 'wife', 'my wife', 'Graphics Department', 'Self', 'Abbay'" },
+        recipient: { type: "string", description: "Recipient name, e.g. 'Dani', 'Sura', 'Simon', 'wife', 'my wife', 'Graphics Department', 'Self', 'Bereket'" },
         actionType: {
           type: "string",
           enum: ["direct_message", "task_report", "deadline_summary", "custom_reminder"],
@@ -293,7 +293,7 @@ export const AI_TOOLS: ToolDefinition[] = [
         senderAccount: {
           type: "string",
           enum: ["bot", "personal"],
-          description: "Account to send from: 'bot' (assistant bot @BereketAssistantBot) or 'personal' (Abbay's personal Telegram identity). Default is 'bot'.",
+          description: "Account to send from: 'bot' (assistant bot @BereketAssistantBot) or 'personal' (Bereket's personal Telegram identity). Default is 'bot'.",
         },
         reportType: {
           type: "string",
@@ -356,7 +356,7 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "check_personal_telegram_status",
-    description: "Check if Abbay's personal Telegram account (GramJS) is connected, view account name, username, phone, or connection state.",
+    description: "Check if Bereket's personal Telegram account (GramJS) is connected, view account name, username, phone, or connection state.",
     parameters: {
       type: "object",
       properties: {},
@@ -364,7 +364,7 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "search_personal_contacts",
-    description: "Search contacts and recent conversations in Abbay's personal Telegram account by name, username, or phone number.",
+    description: "Search contacts and recent conversations in Bereket's personal Telegram account by name, username, or phone number.",
     parameters: {
       type: "object",
       properties: {
@@ -375,7 +375,7 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "get_personal_conversation_messages",
-    description: "Retrieve recent messages from a conversation in Abbay's personal Telegram account (identifies sender, incoming/outgoing, and timestamps).",
+    description: "Retrieve recent messages from a conversation in Bereket's personal Telegram account (identifies sender, incoming/outgoing, and timestamps).",
     parameters: {
       type: "object",
       properties: {
@@ -387,7 +387,7 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "summarize_personal_conversation",
-    description: "Summarize recent messages from a personal Telegram conversation, distinguishing what the contact said, what Abbay said, decisions, unanswered questions, and action items.",
+    description: "Summarize recent messages from a personal Telegram conversation, distinguishing what the contact said, what Bereket said, decisions, unanswered questions, and action items.",
     parameters: {
       type: "object",
       properties: {
@@ -411,7 +411,7 @@ export const AI_TOOLS: ToolDefinition[] = [
   },
   {
     name: "prepare_personal_telegram_send",
-    description: "Prepare to send an immediate message from Abbay's personal Telegram account (as Abbay, NOT @BereketAssistantBot). Prompts for explicit user confirmation before dispatching.",
+    description: "Prepare to send an immediate message from Bereket's personal Telegram account (as Bereket, NOT @BereketAssistantBot). Prompts for explicit user confirmation before dispatching.",
     parameters: {
       type: "object",
       properties: {

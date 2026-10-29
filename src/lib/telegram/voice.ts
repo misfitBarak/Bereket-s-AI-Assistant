@@ -158,11 +158,11 @@ export async function transcribeTelegramAudio(
   const selectedModel = options?.model || process.env.GEMINI_AUDIO_MODEL || "gemini-flash-latest";
   const base64Audio = audioBuffer.toString("base64");
 
-  const domainPrompt = `You are a precise, verbatim speech-to-text transcription engine for Abbay's Personal AI Command Center.
-Abbay is the Graphics Department Lead at Abbay TV in Addis Ababa, Ethiopia (Africa/Addis_Ababa timezone).
+  const domainPrompt = `You are a precise, verbatim speech-to-text transcription engine for Bereket's Personal AI Command Center.
+Bereket is the Graphics Department Lead at Abbay TV in Addis Ababa, Ethiopia (Africa/Addis_Ababa timezone).
 
 Domain Vocabulary & Names:
-- Team Members: Dani (lead motion designer), Sura (3D/broadcast artist), Simon (video editor), Kiru (motion designer), Bereket, Abbay.
+- Team Members: Dani (lead motion designer), Sura (3D/broadcast artist), Simon (video editor), Kiru (motion designer), Bereket (lead).
 - Workspaces: Abbay TV (broadcast graphics, promos, lower thirds, L-shapes, media packs), Client Work, Personal Projects.
 - Projects & Clients: MMA, EthioTelecom, DaVinci Resolve Masterclass.
 - Technical Deliverables: Promo, Teaser, Advert, Lower Third, L-Shape, Media Pack, Thumbnail, Premiere, DaVinci.

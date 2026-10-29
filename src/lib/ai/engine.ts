@@ -60,8 +60,8 @@ export async function processUserMessage(
     day: "numeric",
   });
 
-  const systemPrompt = `You are the Personal AI Command Center assistant for Abbay, Graphics Department Lead at Abbay TV (an Ethiopian television station) with 6+ years experience in video editing, motion graphics, DaVinci Resolve, and TV broadcast packaging.
-Abbay also manages freelance client video projects and personal content/educational ventures.
+  const systemPrompt = `You are the Personal AI Command Center assistant for Bereket (Barakat), Graphics Department Lead at Abbay TV (an Ethiopian television station) with 6+ years experience in video editing, motion graphics, DaVinci Resolve, and TV broadcast packaging.
+Bereket also manages freelance client video projects and personal content/educational ventures.
 
 Current System Date & Time Anchor: ${dateFormatted} (Year: ${now.getFullYear()})
 CRITICAL TIME ANCHOR: Today is Wednesday, October 14, 2026. All relative deadlines ("tomorrow", "this Thursday", "by Friday", "next week") MUST be anchored to October 2026 or later. NEVER invent, suggest, or output dates in past years (such as 2024 or 2025).
@@ -86,7 +86,7 @@ CRITICAL OPERATIONAL RULES:
 5. When planning schedules, differentiate urgent broadcast promos from freelance and personal goals without overloading available hours. Provide concise, professional, articulate, and actionable responses.
 6. PERSONAL TELEGRAM ACCOUNT & IDENTITY SEPARATION:
    - There are TWO distinct messaging identities:
-     a) Personal Telegram Account: sends directly as Abbay's personal identity (via GramJS MTProto).
+     a) Personal Telegram Account: sends directly as Bereket's personal identity (via GramJS MTProto).
      b) Assistant Bot: sends as @BereketAssistantBot.
    - When the user asks to "Find my conversation with my wife", "Show latest messages from Dani", "Summarize conversation", or "Draft a reply", invoke the personal Telegram tools (search_personal_contacts, get_personal_conversation_messages, summarize_personal_conversation, draft_personal_reply).
    - When the user says "Send my wife a message...", "Tell Dani I...", or "Reply to Dani...", ALWAYS call \`prepare_personal_telegram_send\` to require explicit user confirmation before sending as their personal identity.
@@ -805,7 +805,7 @@ async function runAutonomousLocalEngine(
     const { result } = await executeTool("get_today_focus", { workspace: "all" });
     const { tasks } = result;
 
-    let content = `### 🎯 Today's Priority Focus for Abbay\n\n`;
+    let content = `### 🎯 Today's Priority Focus for Bereket\n\n`;
     if (tasks.length === 0) {
       content += `You have no urgent tasks scheduled for today. You can focus on proactive projects or personal tutorials!`;
     } else {
@@ -1009,7 +1009,7 @@ async function runAutonomousLocalEngine(
   if (lower.includes("plan my week") || lower.includes("plan my day") || lower.includes("daily plan") || lower.includes("plan around")) {
     const { result } = await executeTool("generate_daily_plan", {});
 
-    let content = `### 📅 Balanced Schedule Plan for Abbay\n\n`;
+    let content = `### 📅 Balanced Schedule Plan for Bereket\n\n`;
     content += `This plan separates your **Abbay TV leadership**, **high-value freelance clients**, and **personal creative projects** to prevent overlap:\n\n`;
     content += `**🌅 Morning Focus (09:00 - 12:30) — Abbay TV Graphics Department**\n`;
     content += `- ${result.morningBlock}\n\n`;
@@ -1174,7 +1174,7 @@ async function runAutonomousLocalEngine(
       .trim();
     const { result, pendingConfirmation } = await executeTool("request_task_deletion", {
       taskTitleOrId: targetTitle || userMessage,
-      reason: "Requested by Abbay via chat",
+      reason: "Requested by Bereket via chat",
     });
 
     return wrapResponse({
@@ -1297,7 +1297,7 @@ async function runAutonomousLocalEngine(
   // Default conversational response with real live summary
   const { result: focusRes } = await executeTool("get_today_focus", { workspace: "all" });
   return wrapResponse({
-    content: `Hello Abbay. I am your Personal AI Command Center, operating in **Autonomous Engine (Demo Mode)**.
+    content: `Hello Bereket. I am your Personal AI Command Center, operating in **Autonomous Engine (Demo Mode)**.
 
 Currently active across your workspaces:
 - **${focusRes.count} active priority items** across Abbay TV, freelance, and personal ventures.

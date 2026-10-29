@@ -212,14 +212,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
-                  Ab
+                  BT
                 </div>
                 <div className="truncate text-left leading-tight">
                   <span className="text-xs font-bold text-slate-900 dark:text-white block truncate">
-                    Abbay
+                    Bereket
                   </span>
                   <span className="text-[10px] text-slate-500 block truncate">
-                    Graphics Lead
+                    Abbay TV Graphics Lead
                   </span>
                 </div>
               </div>
@@ -229,11 +229,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           ) : (
             <div
-              title="Abbay (Graphics Lead)"
+              title="Bereket (Abbay TV Graphics Lead)"
               className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center justify-center w-full"
             >
               <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold text-xs">
-                Ab
+                BT
               </div>
             </div>
           )}
